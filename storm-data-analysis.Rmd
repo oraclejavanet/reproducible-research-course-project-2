@@ -20,7 +20,11 @@ knitr::opts_chunk$set(echo = TRUE)
 [Synonpsis](#synonpsis)<br />
 [Set up environment](#set-up-environment)<br />
 [Data Processing](#data-processing)<br />
-[Results](#results)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Load and Process Data](#load-and-process-data)<br />
+[Results](#results)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types Most Harmful to Population Health](#event-types-most-harmful-to-population-health)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types with Greatest Economic Consequences](#event-types-with-greatest-economic-consequences)
+[Conclusion](#conclusion)
 
 ## Introduction
 
@@ -36,9 +40,29 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Data Processing
 
+### Load and Process Data
+
+*pending*
+
+### Impact on Public Health
+
+*pending*
+
+### Impact on Economy
+
 *pending*
 
 ## Results
+
+### Event Types Most Harmful to Population Health
+
+*pending*
+
+### Event Types with Greatest Economic Consequences
+
+*pending*
+
+## Conclusion
 
 *pending*
 
