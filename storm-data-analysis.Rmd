@@ -1,0 +1,48 @@
+---
+title: "Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy"
+author: "Jeffrey Hunter"
+date: "4/23/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  html_notebook: default
+  pdf_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Table of Contents
+
+[Introduction](#introduction)<br />
+[Synonpsis](#synonpsis)<br />
+[Set up environment](#set-up-environment)<br />
+[Data Processing](#data-processing)<br />
+[Results](#results)
+
+## Introduction
+
+*pending*
+
+## Synonpsis
+
+*pending*
+
+## Set up environment
+
+*pending*
+
+## Data Processing
+
+*pending*
+
+## Results
+
+*pending*
+
+
+
+
+
