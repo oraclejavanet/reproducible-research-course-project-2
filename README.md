@@ -8,9 +8,13 @@ April 23, 2019
 
 Peer-graded Assignment: Course Project 2
 
-**Analysis report available on RPubs**:
+* **Analysis report available on RPubs**
 
-* <a href="http://rpubs.com/OracleJavaNet">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
+    <a href="http://rpubs.com/OracleJavaNet">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
+
+* **Storm data analysis peport**
+
+    <a href="http://htmlpreview.github.io/?https://github.com/oraclejavanet/reproducible-research-course-project-2/blob/master/storm-data-analysis.html">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
 
 ## Introduction
 
