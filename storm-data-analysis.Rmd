@@ -19,11 +19,13 @@ knitr::opts_chunk$set(echo = TRUE)
 [Introduction](#introduction)<br />
 [Synonpsis](#synonpsis)<br />
 [Set up environment](#set-up-environment)<br />
+[Load Data](#load-data)<br />
 [Data Processing](#data-processing)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Load and Process Data](#load-and-process-data)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Impact on Public Health](#impact-on-public-health)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Impact on Economy](#impact-on-economy)<br />
 [Results](#results)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types Most Harmful to Population Health](#event-types-most-harmful-to-population-health)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types with Greatest Economic Consequences](#event-types-with-greatest-economic-consequences)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types with Greatest Economic Consequences](#event-types-with-greatest-economic-consequences)<br />
 [Conclusion](#conclusion)
 
 ## Introduction
@@ -38,11 +40,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 *pending*
 
-## Data Processing
-
-### Load and Process Data
+## Load Data
 
 *pending*
+
+## Data Processing
 
 ### Impact on Public Health
 
