@@ -12,7 +12,6 @@ output:
 
 ## Table of Contents
 
-[Introduction](#introduction)<br />
 [Synonpsis](#synonpsis)<br />
 [Set up environment](#set-up-environment)<br />
 [Load Data](#load-data)<br />
@@ -24,13 +23,24 @@ output:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types with Greatest Economic Consequences](#event-types-with-greatest-economic-consequences)<br />
 [Conclusion](#conclusion)
 
-## Introduction
-
-*pending*
-
 ## Synonpsis
 
-*pending*
+This goal for this report is to analyze 
+several weather events in the United States between the years 1950 and 2011
+
+
+
+Storms and other severe weather events can cause both public health and economic
+problems for communities and municipalities. Many severe events can result in
+fatalities, injuries, and property damage, and preventing such outcomes to the
+extent possible is a key concern.
+
+This project involves exploring the U.S. National Oceanic and Atmospheric
+Administration's (NOAA) storm database. This database tracks characteristics of
+major storms and weather events in the United States, including when and where
+they occur, as well as estimates of any fatalities, injuries, and property
+damage.
+
 
 ## Set up environment
 
@@ -56,7 +66,10 @@ sessionInfo()
 
 ## Load Data
 
-Download data file from Internet (if it doesn't exit) and load the data.
+Download the compressed data file from the source URL (if not found locally) and
+then load the compressed data file via `read.csv`. Prior to processing
+the data, validate the downloaded data file and loaded dataset by checking the file 
+size and dimensions respectively.
 
 ```{r, echo = TRUE, cache = TRUE}
 setwd("~jhunter/repos/coursera/reproducible-research-course-project-2")
@@ -68,9 +81,9 @@ if (!file.exists('data')) {
 if (!file.exists(stormDataFile)) {
     download.file(url = stormDataFileURL, destfile = stormDataFile)
 }
-# read.csv handles compressed files automatically
 stormData <- read.csv(stormDataFile, sep = ",")
-#activityData$date <- as.POSIXct(activityData$date, format = "%Y-%m-%d", tz = "")
+stopifnot(file.size(stormDataFile) == 49177144) 
+stopifnot(dim(stormData) == c(902297,37))
 ```
 
 Display dataset summary

@@ -200,22 +200,20 @@ $(document).ready(function () {
 
 <div id="table-of-contents" class="section level2">
 <h2>Table of Contents</h2>
-<p><a href="#introduction">Introduction</a><br /> <a href="#synonpsis">Synonpsis</a><br /> <a href="#set-up-environment">Set up environment</a><br /> <a href="#load-data">Load Data</a><br /> <a href="#data-processing">Data Processing</a><br />          <a href="#impact-on-public-health">Impact on Public Health</a><br />          <a href="#impact-on-economy">Impact on Economy</a><br /> <a href="#results">Results</a><br />          <a href="#event-types-most-harmful-to-population-health">Event Types Most Harmful to Population Health</a><br />          <a href="#event-types-with-greatest-economic-consequences">Event Types with Greatest Economic Consequences</a><br /> <a href="#conclusion">Conclusion</a></p>
-</div>
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-<p><em>pending</em></p>
+<p><a href="#synonpsis">Synonpsis</a><br /> <a href="#set-up-environment">Set up environment</a><br /> <a href="#load-data">Load Data</a><br /> <a href="#data-processing">Data Processing</a><br />          <a href="#impact-on-public-health">Impact on Public Health</a><br />          <a href="#impact-on-economy">Impact on Economy</a><br /> <a href="#results">Results</a><br />          <a href="#event-types-most-harmful-to-population-health">Event Types Most Harmful to Population Health</a><br />          <a href="#event-types-with-greatest-economic-consequences">Event Types with Greatest Economic Consequences</a><br /> <a href="#conclusion">Conclusion</a></p>
 </div>
 <div id="synonpsis" class="section level2">
 <h2>Synonpsis</h2>
-<p><em>pending</em></p>
+<p>This goal for this report is to analyze several weather events in the United States between the years 1950 and 2011</p>
+<p>Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.</p>
+<p>This project involves exploring the U.S. National Oceanic and Atmospheric Administration’s (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.</p>
 </div>
 <div id="set-up-environment" class="section level2">
 <h2>Set up environment</h2>
 <p>Disable warnings</p>
 <pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)</code></pre>
 <p>Load libraries</p>
-<pre class="r"><code>options(scipen = 1)
+<pre class="r"><code>options(scipen = 1) # disable scientific notation for numbers
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)</code></pre>
 <p>Session information</p>
@@ -249,7 +247,7 @@ library(ggplot2)</code></pre>
 </div>
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
-<p>Download data file from Internet (if it doesn’t exit) and load the data.</p>
+<p>Download the compressed data file from the source URL (if not found locally) and then load the compressed data file via <code>read.csv</code>. Prior to processing the data, validate the downloaded data file and loaded dataset by checking the file size and dimensions respectively.</p>
 <pre class="r"><code>setwd(&quot;~jhunter/repos/coursera/reproducible-research-course-project-2&quot;)
 stormDataFileURL &lt;- &quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2&quot;
 stormDataFile &lt;- &quot;data/storm-data.csv.bz2&quot;
@@ -259,9 +257,9 @@ if (!file.exists('data')) {
 if (!file.exists(stormDataFile)) {
     download.file(url = stormDataFileURL, destfile = stormDataFile)
 }
-# read.csv handles compressed files automatically
 stormData &lt;- read.csv(stormDataFile, sep = &quot;,&quot;)
-#activityData$date &lt;- as.POSIXct(activityData$date, format = &quot;%Y-%m-%d&quot;, tz = &quot;&quot;)</code></pre>
+stopifnot(file.size(stormDataFile) == 49177144) 
+stopifnot(dim(stormData) == c(902297,37))</code></pre>
 <p>Display dataset summary</p>
 <pre class="r"><code>names(stormData)</code></pre>
 <pre><code>##  [1] &quot;STATE__&quot;    &quot;BGN_DATE&quot;   &quot;BGN_TIME&quot;   &quot;TIME_ZONE&quot;  &quot;COUNTY&quot;    
