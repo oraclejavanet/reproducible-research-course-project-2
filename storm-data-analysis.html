@@ -193,7 +193,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</h1>
 <h4 class="author">Jeffrey Hunter</h4>
-<h4 class="date">4/23/2019</h4>
+<h4 class="date">4/24/2019</h4>
 
 </div>
 
@@ -212,11 +212,208 @@ $(document).ready(function () {
 </div>
 <div id="set-up-environment" class="section level2">
 <h2>Set up environment</h2>
-<p><em>pending</em></p>
+<p>Disable warnings</p>
+<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)</code></pre>
+<p>Load libraries</p>
+<pre class="r"><code>options(scipen = 1)
+library(dplyr, warn.conflicts = FALSE)
+library(ggplot2)</code></pre>
+<p>Session information</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.5.3 (2019-03-11)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS Sierra 10.12.6
+## 
+## Matrix products: default
+## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] ggplot2_3.1.1 dplyr_0.8.0.1
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.1       knitr_1.22       magrittr_1.5     tidyselect_0.2.5
+##  [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.0         rlang_0.3.4     
+##  [9] plyr_1.8.4       stringr_1.4.0    tools_3.5.3      grid_3.5.3      
+## [13] packrat_0.5.0    gtable_0.3.0     xfun_0.6         withr_2.1.2     
+## [17] htmltools_0.3.6  lazyeval_0.2.2   yaml_2.2.0       assertthat_0.2.1
+## [21] digest_0.6.18    tibble_2.1.1     crayon_1.3.4     purrr_0.3.2     
+## [25] glue_1.3.1       evaluate_0.13    rmarkdown_1.12   stringi_1.4.3   
+## [29] compiler_3.5.3   pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2</code></pre>
 </div>
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
-<p><em>pending</em></p>
+<p>Download data file from Internet (if it doesn’t exit) and load the data.</p>
+<pre class="r"><code>setwd(&quot;~jhunter/repos/coursera/reproducible-research-course-project-2&quot;)
+stormDataFileURL &lt;- &quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2&quot;
+stormDataFile &lt;- &quot;data/storm-data.csv.bz2&quot;
+if (!file.exists('data')) {
+    dir.create('data')
+}
+if (!file.exists(stormDataFile)) {
+    download.file(url = stormDataFileURL, destfile = stormDataFile)
+}
+# read.csv handles compressed files automatically
+stormData &lt;- read.csv(stormDataFile, sep = &quot;,&quot;)
+#activityData$date &lt;- as.POSIXct(activityData$date, format = &quot;%Y-%m-%d&quot;, tz = &quot;&quot;)</code></pre>
+<p>Display dataset summary</p>
+<pre class="r"><code>names(stormData)</code></pre>
+<pre><code>##  [1] &quot;STATE__&quot;    &quot;BGN_DATE&quot;   &quot;BGN_TIME&quot;   &quot;TIME_ZONE&quot;  &quot;COUNTY&quot;    
+##  [6] &quot;COUNTYNAME&quot; &quot;STATE&quot;      &quot;EVTYPE&quot;     &quot;BGN_RANGE&quot;  &quot;BGN_AZI&quot;   
+## [11] &quot;BGN_LOCATI&quot; &quot;END_DATE&quot;   &quot;END_TIME&quot;   &quot;COUNTY_END&quot; &quot;COUNTYENDN&quot;
+## [16] &quot;END_RANGE&quot;  &quot;END_AZI&quot;    &quot;END_LOCATI&quot; &quot;LENGTH&quot;     &quot;WIDTH&quot;     
+## [21] &quot;F&quot;          &quot;MAG&quot;        &quot;FATALITIES&quot; &quot;INJURIES&quot;   &quot;PROPDMG&quot;   
+## [26] &quot;PROPDMGEXP&quot; &quot;CROPDMG&quot;    &quot;CROPDMGEXP&quot; &quot;WFO&quot;        &quot;STATEOFFIC&quot;
+## [31] &quot;ZONENAMES&quot;  &quot;LATITUDE&quot;   &quot;LONGITUDE&quot;  &quot;LATITUDE_E&quot; &quot;LONGITUDE_&quot;
+## [36] &quot;REMARKS&quot;    &quot;REFNUM&quot;</code></pre>
+<pre class="r"><code>str(stormData)</code></pre>
+<pre><code>## 'data.frame':    902297 obs. of  37 variables:
+##  $ STATE__   : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ BGN_DATE  : Factor w/ 16335 levels &quot;1/1/1966 0:00:00&quot;,..: 6523 6523 4242 11116 2224 2224 2260 383 3980 3980 ...
+##  $ BGN_TIME  : Factor w/ 3608 levels &quot;00:00:00 AM&quot;,..: 272 287 2705 1683 2584 3186 242 1683 3186 3186 ...
+##  $ TIME_ZONE : Factor w/ 22 levels &quot;ADT&quot;,&quot;AKS&quot;,&quot;AST&quot;,..: 7 7 7 7 7 7 7 7 7 7 ...
+##  $ COUNTY    : num  97 3 57 89 43 77 9 123 125 57 ...
+##  $ COUNTYNAME: Factor w/ 29601 levels &quot;&quot;,&quot;5NM E OF MACKINAC BRIDGE TO PRESQUE ISLE LT MI&quot;,..: 13513 1873 4598 10592 4372 10094 1973 23873 24418 4598 ...
+##  $ STATE     : Factor w/ 72 levels &quot;AK&quot;,&quot;AL&quot;,&quot;AM&quot;,..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ EVTYPE    : Factor w/ 985 levels &quot;   HIGH SURF ADVISORY&quot;,..: 834 834 834 834 834 834 834 834 834 834 ...
+##  $ BGN_RANGE : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ BGN_AZI   : Factor w/ 35 levels &quot;&quot;,&quot;  N&quot;,&quot; NW&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ BGN_LOCATI: Factor w/ 54429 levels &quot;&quot;,&quot; Christiansburg&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ END_DATE  : Factor w/ 6663 levels &quot;&quot;,&quot;1/1/1993 0:00:00&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ END_TIME  : Factor w/ 3647 levels &quot;&quot;,&quot; 0900CST&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ COUNTY_END: num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ COUNTYENDN: logi  NA NA NA NA NA NA ...
+##  $ END_RANGE : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ END_AZI   : Factor w/ 24 levels &quot;&quot;,&quot;E&quot;,&quot;ENE&quot;,&quot;ESE&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ END_LOCATI: Factor w/ 34506 levels &quot;&quot;,&quot; CANTON&quot;,&quot; TULIA&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ LENGTH    : num  14 2 0.1 0 0 1.5 1.5 0 3.3 2.3 ...
+##  $ WIDTH     : num  100 150 123 100 150 177 33 33 100 100 ...
+##  $ F         : int  3 2 2 2 2 2 2 1 3 3 ...
+##  $ MAG       : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ FATALITIES: num  0 0 0 0 0 0 0 0 1 0 ...
+##  $ INJURIES  : num  15 0 2 2 2 6 1 0 14 0 ...
+##  $ PROPDMG   : num  25 2.5 25 2.5 2.5 2.5 2.5 2.5 25 25 ...
+##  $ PROPDMGEXP: Factor w/ 19 levels &quot;&quot;,&quot;-&quot;,&quot;?&quot;,&quot;+&quot;,..: 17 17 17 17 17 17 17 17 17 17 ...
+##  $ CROPDMG   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CROPDMGEXP: Factor w/ 9 levels &quot;&quot;,&quot;?&quot;,&quot;0&quot;,&quot;2&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ WFO       : Factor w/ 542 levels &quot;&quot;,&quot; CI&quot;,&quot;%SD&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ STATEOFFIC: Factor w/ 250 levels &quot;&quot;,&quot;ALABAMA, Central&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ ZONENAMES : Factor w/ 25112 levels &quot;&quot;,&quot;                                                                                                               &quot;| __truncated__,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ LATITUDE  : num  3040 3042 3340 3458 3412 ...
+##  $ LONGITUDE : num  8812 8755 8742 8626 8642 ...
+##  $ LATITUDE_E: num  3051 0 0 0 0 ...
+##  $ LONGITUDE_: num  8806 0 0 0 0 ...
+##  $ REMARKS   : Factor w/ 436781 levels &quot;&quot;,&quot;\t&quot;,&quot;\t\t&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ REFNUM    : num  1 2 3 4 5 6 7 8 9 10 ...</code></pre>
+<pre class="r"><code>summary(stormData)</code></pre>
+<pre><code>##     STATE__                  BGN_DATE             BGN_TIME     
+##  Min.   : 1.0   5/25/2011 0:00:00:  1202   12:00:00 AM: 10163  
+##  1st Qu.:19.0   4/27/2011 0:00:00:  1193   06:00:00 PM:  7350  
+##  Median :30.0   6/9/2011 0:00:00 :  1030   04:00:00 PM:  7261  
+##  Mean   :31.2   5/30/2004 0:00:00:  1016   05:00:00 PM:  6891  
+##  3rd Qu.:45.0   4/4/2011 0:00:00 :  1009   12:00:00 PM:  6703  
+##  Max.   :95.0   4/2/2006 0:00:00 :   981   03:00:00 PM:  6700  
+##                 (Other)          :895866   (Other)    :857229  
+##    TIME_ZONE          COUNTY           COUNTYNAME         STATE       
+##  CST    :547493   Min.   :  0.0   JEFFERSON :  7840   TX     : 83728  
+##  EST    :245558   1st Qu.: 31.0   WASHINGTON:  7603   KS     : 53440  
+##  MST    : 68390   Median : 75.0   JACKSON   :  6660   OK     : 46802  
+##  PST    : 28302   Mean   :100.6   FRANKLIN  :  6256   MO     : 35648  
+##  AST    :  6360   3rd Qu.:131.0   LINCOLN   :  5937   IA     : 31069  
+##  HST    :  2563   Max.   :873.0   MADISON   :  5632   NE     : 30271  
+##  (Other):  3631                   (Other)   :862369   (Other):621339  
+##                EVTYPE         BGN_RANGE           BGN_AZI      
+##  HAIL             :288661   Min.   :   0.000          :547332  
+##  TSTM WIND        :219940   1st Qu.:   0.000   N      : 86752  
+##  THUNDERSTORM WIND: 82563   Median :   0.000   W      : 38446  
+##  TORNADO          : 60652   Mean   :   1.484   S      : 37558  
+##  FLASH FLOOD      : 54277   3rd Qu.:   1.000   E      : 33178  
+##  FLOOD            : 25326   Max.   :3749.000   NW     : 24041  
+##  (Other)          :170878                      (Other):134990  
+##          BGN_LOCATI                  END_DATE             END_TIME     
+##               :287743                    :243411              :238978  
+##  COUNTYWIDE   : 19680   4/27/2011 0:00:00:  1214   06:00:00 PM:  9802  
+##  Countywide   :   993   5/25/2011 0:00:00:  1196   05:00:00 PM:  8314  
+##  SPRINGFIELD  :   843   6/9/2011 0:00:00 :  1021   04:00:00 PM:  8104  
+##  SOUTH PORTION:   810   4/4/2011 0:00:00 :  1007   12:00:00 PM:  7483  
+##  NORTH PORTION:   784   5/30/2004 0:00:00:   998   11:59:00 PM:  7184  
+##  (Other)      :591444   (Other)          :653450   (Other)    :622432  
+##    COUNTY_END COUNTYENDN       END_RANGE           END_AZI      
+##  Min.   :0    Mode:logical   Min.   :  0.0000          :724837  
+##  1st Qu.:0    NA's:902297    1st Qu.:  0.0000   N      : 28082  
+##  Median :0                   Median :  0.0000   S      : 22510  
+##  Mean   :0                   Mean   :  0.9862   W      : 20119  
+##  3rd Qu.:0                   3rd Qu.:  0.0000   E      : 20047  
+##  Max.   :0                   Max.   :925.0000   NE     : 14606  
+##                                                 (Other): 72096  
+##            END_LOCATI         LENGTH              WIDTH         
+##                 :499225   Min.   :   0.0000   Min.   :   0.000  
+##  COUNTYWIDE     : 19731   1st Qu.:   0.0000   1st Qu.:   0.000  
+##  SOUTH PORTION  :   833   Median :   0.0000   Median :   0.000  
+##  NORTH PORTION  :   780   Mean   :   0.2301   Mean   :   7.503  
+##  CENTRAL PORTION:   617   3rd Qu.:   0.0000   3rd Qu.:   0.000  
+##  SPRINGFIELD    :   575   Max.   :2315.0000   Max.   :4400.000  
+##  (Other)        :380536                                         
+##        F               MAG            FATALITIES          INJURIES        
+##  Min.   :0.0      Min.   :    0.0   Min.   :  0.0000   Min.   :   0.0000  
+##  1st Qu.:0.0      1st Qu.:    0.0   1st Qu.:  0.0000   1st Qu.:   0.0000  
+##  Median :1.0      Median :   50.0   Median :  0.0000   Median :   0.0000  
+##  Mean   :0.9      Mean   :   46.9   Mean   :  0.0168   Mean   :   0.1557  
+##  3rd Qu.:1.0      3rd Qu.:   75.0   3rd Qu.:  0.0000   3rd Qu.:   0.0000  
+##  Max.   :5.0      Max.   :22000.0   Max.   :583.0000   Max.   :1700.0000  
+##  NA's   :843563                                                           
+##     PROPDMG          PROPDMGEXP        CROPDMG          CROPDMGEXP    
+##  Min.   :   0.00          :465934   Min.   :  0.000          :618413  
+##  1st Qu.:   0.00   K      :424665   1st Qu.:  0.000   K      :281832  
+##  Median :   0.00   M      : 11330   Median :  0.000   M      :  1994  
+##  Mean   :  12.06   0      :   216   Mean   :  1.527   k      :    21  
+##  3rd Qu.:   0.50   B      :    40   3rd Qu.:  0.000   0      :    19  
+##  Max.   :5000.00   5      :    28   Max.   :990.000   B      :     9  
+##                    (Other):    84                     (Other):     9  
+##       WFO                                       STATEOFFIC    
+##         :142069                                      :248769  
+##  OUN    : 17393   TEXAS, North                       : 12193  
+##  JAN    : 13889   ARKANSAS, Central and North Central: 11738  
+##  LWX    : 13174   IOWA, Central                      : 11345  
+##  PHI    : 12551   KANSAS, Southwest                  : 11212  
+##  TSA    : 12483   GEORGIA, North and Central         : 11120  
+##  (Other):690738   (Other)                            :595920  
+##                                                                                                                                                                                                     ZONENAMES     
+##                                                                                                                                                                                                          :594029  
+##                                                                                                                                                                                                          :205988  
+##  GREATER RENO / CARSON CITY / M - GREATER RENO / CARSON CITY / M                                                                                                                                         :   639  
+##  GREATER LAKE TAHOE AREA - GREATER LAKE TAHOE AREA                                                                                                                                                       :   592  
+##  JEFFERSON - JEFFERSON                                                                                                                                                                                   :   303  
+##  MADISON - MADISON                                                                                                                                                                                       :   302  
+##  (Other)                                                                                                                                                                                                 :100444  
+##     LATITUDE      LONGITUDE        LATITUDE_E     LONGITUDE_    
+##  Min.   :   0   Min.   :-14451   Min.   :   0   Min.   :-14455  
+##  1st Qu.:2802   1st Qu.:  7247   1st Qu.:   0   1st Qu.:     0  
+##  Median :3540   Median :  8707   Median :   0   Median :     0  
+##  Mean   :2875   Mean   :  6940   Mean   :1452   Mean   :  3509  
+##  3rd Qu.:4019   3rd Qu.:  9605   3rd Qu.:3549   3rd Qu.:  8735  
+##  Max.   :9706   Max.   : 17124   Max.   :9706   Max.   :106220  
+##  NA's   :47                      NA's   :40                     
+##                                            REMARKS           REFNUM      
+##                                                :287433   Min.   :     1  
+##                                                : 24013   1st Qu.:225575  
+##  Trees down.\n                                 :  1110   Median :451149  
+##  Several trees were blown down.\n              :   568   Mean   :451149  
+##  Trees were downed.\n                          :   446   3rd Qu.:676723  
+##  Large trees and power lines were blown down.\n:   432   Max.   :902297  
+##  (Other)                                       :588295</code></pre>
+<pre class="r"><code>head(stormData)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["STATE__"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["BGN_DATE"],"name":[2],"type":["fctr"],"align":["left"]},{"label":["BGN_TIME"],"name":[3],"type":["fctr"],"align":["left"]},{"label":["TIME_ZONE"],"name":[4],"type":["fctr"],"align":["left"]},{"label":["COUNTY"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["COUNTYNAME"],"name":[6],"type":["fctr"],"align":["left"]},{"label":["STATE"],"name":[7],"type":["fctr"],"align":["left"]},{"label":["EVTYPE"],"name":[8],"type":["fctr"],"align":["left"]},{"label":["BGN_RANGE"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["BGN_AZI"],"name":[10],"type":["fctr"],"align":["left"]},{"label":["BGN_LOCATI"],"name":[11],"type":["fctr"],"align":["left"]},{"label":["END_DATE"],"name":[12],"type":["fctr"],"align":["left"]},{"label":["END_TIME"],"name":[13],"type":["fctr"],"align":["left"]},{"label":["COUNTY_END"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["COUNTYENDN"],"name":[15],"type":["lgl"],"align":["right"]},{"label":["END_RANGE"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["END_AZI"],"name":[17],"type":["fctr"],"align":["left"]},{"label":["END_LOCATI"],"name":[18],"type":["fctr"],"align":["left"]},{"label":["LENGTH"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["WIDTH"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[21],"type":["int"],"align":["right"]},{"label":["MAG"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["FATALITIES"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["INJURIES"],"name":[24],"type":["dbl"],"align":["right"]},{"label":["PROPDMG"],"name":[25],"type":["dbl"],"align":["right"]},{"label":["PROPDMGEXP"],"name":[26],"type":["fctr"],"align":["left"]},{"label":["CROPDMG"],"name":[27],"type":["dbl"],"align":["right"]},{"label":["CROPDMGEXP"],"name":[28],"type":["fctr"],"align":["left"]},{"label":["WFO"],"name":[29],"type":["fctr"],"align":["left"]},{"label":["STATEOFFIC"],"name":[30],"type":["fctr"],"align":["left"]},{"label":["ZONENAMES"],"name":[31],"type":["fctr"],"align":["left"]},{"label":["LATITUDE"],"name":[32],"type":["dbl"],"align":["right"]},{"label":["LONGITUDE"],"name":[33],"type":["dbl"],"align":["right"]},{"label":["LATITUDE_E"],"name":[34],"type":["dbl"],"align":["right"]},{"label":["LONGITUDE_"],"name":[35],"type":["dbl"],"align":["right"]},{"label":["REMARKS"],"name":[36],"type":["fctr"],"align":["left"]},{"label":["REFNUM"],"name":[37],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"4/18/1950 0:00:00","3":"0130","4":"CST","5":"97","6":"MOBILE","7":"AL","8":"TORNADO","9":"0","10":"","11":"","12":"","13":"","14":"0","15":"NA","16":"0","17":"","18":"","19":"14.0","20":"100","21":"3","22":"0","23":"0","24":"15","25":"25.0","26":"K","27":"0","28":"","29":"","30":"","31":"","32":"3040","33":"8812","34":"3051","35":"8806","36":"","37":"1","_rn_":"1"},{"1":"1","2":"4/18/1950 0:00:00","3":"0145","4":"CST","5":"3","6":"BALDWIN","7":"AL","8":"TORNADO","9":"0","10":"","11":"","12":"","13":"","14":"0","15":"NA","16":"0","17":"","18":"","19":"2.0","20":"150","21":"2","22":"0","23":"0","24":"0","25":"2.5","26":"K","27":"0","28":"","29":"","30":"","31":"","32":"3042","33":"8755","34":"0","35":"0","36":"","37":"2","_rn_":"2"},{"1":"1","2":"2/20/1951 0:00:00","3":"1600","4":"CST","5":"57","6":"FAYETTE","7":"AL","8":"TORNADO","9":"0","10":"","11":"","12":"","13":"","14":"0","15":"NA","16":"0","17":"","18":"","19":"0.1","20":"123","21":"2","22":"0","23":"0","24":"2","25":"25.0","26":"K","27":"0","28":"","29":"","30":"","31":"","32":"3340","33":"8742","34":"0","35":"0","36":"","37":"3","_rn_":"3"},{"1":"1","2":"6/8/1951 0:00:00","3":"0900","4":"CST","5":"89","6":"MADISON","7":"AL","8":"TORNADO","9":"0","10":"","11":"","12":"","13":"","14":"0","15":"NA","16":"0","17":"","18":"","19":"0.0","20":"100","21":"2","22":"0","23":"0","24":"2","25":"2.5","26":"K","27":"0","28":"","29":"","30":"","31":"","32":"3458","33":"8626","34":"0","35":"0","36":"","37":"4","_rn_":"4"},{"1":"1","2":"11/15/1951 0:00:00","3":"1500","4":"CST","5":"43","6":"CULLMAN","7":"AL","8":"TORNADO","9":"0","10":"","11":"","12":"","13":"","14":"0","15":"NA","16":"0","17":"","18":"","19":"0.0","20":"150","21":"2","22":"0","23":"0","24":"2","25":"2.5","26":"K","27":"0","28":"","29":"","30":"","31":"","32":"3412","33":"8642","34":"0","35":"0","36":"","37":"5","_rn_":"5"},{"1":"1","2":"11/15/1951 0:00:00","3":"2000","4":"CST","5":"77","6":"LAUDERDALE","7":"AL","8":"TORNADO","9":"0","10":"","11":"","12":"","13":"","14":"0","15":"NA","16":"0","17":"","18":"","19":"1.5","20":"177","21":"2","22":"0","23":"0","24":"6","25":"2.5","26":"K","27":"0","28":"","29":"","30":"","31":"","32":"3450","33":"8748","34":"0","35":"0","36":"","37":"6","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 <div id="data-processing" class="section level2">
 <h2>Data Processing</h2>

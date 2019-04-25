@@ -1,7 +1,7 @@
 ---
 title: "Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy"
 author: "Jeffrey Hunter"
-date: "4/23/2019"
+date: "4/24/2019"
 output:
   html_document:
     df_print: paged
@@ -9,10 +9,6 @@ output:
   html_notebook: default
   pdf_notebook: default
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ## Table of Contents
 
@@ -38,11 +34,62 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Set up environment
 
-*pending*
+Disable warnings
+
+```{r setup, include = TRUE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Load libraries
+
+```{r, echo = TRUE}
+options(scipen = 1) # disable scientific notation for numbers
+library(dplyr, warn.conflicts = FALSE)
+library(ggplot2)
+```
+
+Session information
+
+```{r, echo = TRUE}
+sessionInfo()
+```
 
 ## Load Data
 
-*pending*
+Download data file from Internet (if it doesn't exit) and load the data.
+
+```{r, echo = TRUE, cache = TRUE}
+setwd("~jhunter/repos/coursera/reproducible-research-course-project-2")
+stormDataFileURL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+stormDataFile <- "data/storm-data.csv.bz2"
+if (!file.exists('data')) {
+    dir.create('data')
+}
+if (!file.exists(stormDataFile)) {
+    download.file(url = stormDataFileURL, destfile = stormDataFile)
+}
+# read.csv handles compressed files automatically
+stormData <- read.csv(stormDataFile, sep = ",")
+#activityData$date <- as.POSIXct(activityData$date, format = "%Y-%m-%d", tz = "")
+```
+
+Display dataset summary
+
+```{r, echo = TRUE}
+names(stormData)
+```
+
+```{r, echo = TRUE}
+str(stormData)
+```
+
+```{r, echo = TRUE}
+summary(stormData)
+```
+
+```{r, echo = TRUE}
+head(stormData)
+```
 
 ## Data Processing
 
