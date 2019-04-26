@@ -25,22 +25,26 @@ output:
 
 ## Synonpsis
 
-This goal for this report is to analyze 
-several weather events in the United States between the years 1950 and 2011
-
-
-
 Storms and other severe weather events can cause both public health and economic
 problems for communities and municipalities. Many severe events can result in
 fatalities, injuries, and property damage, and preventing such outcomes to the
 extent possible is a key concern.
 
-This project involves exploring the U.S. National Oceanic and Atmospheric
-Administration's (NOAA) storm database. This database tracks characteristics of
-major storms and weather events in the United States, including when and where
-they occur, as well as estimates of any fatalities, injuries, and property
-damage.
+This report contains the results of an analysis where the goal was to identify
+the most hazardous weather events with respect to public health and those with
+the greatest economic impact in the U.S. based on data collected from the U.S.
+National Oceanic and Atmospheric Administration's (NOAA).
 
+The storm database includes weather events from 1950 through the year 2011 and
+contains data estimates such as the number fatalities and injuries for each
+weather event as well as economic damage on properties and crops.
+
+The estimates for fatalities, injuries, property and crop damage was used
+to determine the most harmful impact to both public health and the economy.
+
+The results in this report found that excessive heat and tornado were most
+harmful with respect to public health, while flood, drought, and
+hurricane/typhoon had the greatest economic impact.
 
 ## Set up environment
 
@@ -105,6 +109,8 @@ head(stormData)
 ```
 
 ## Data Processing
+
+#stormData$BGN_DATE <- as.Date(stormData$BGN_DATE, format = "%m/%d/%Y")
 
 ### Impact on Public Health
 
