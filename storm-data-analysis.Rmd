@@ -254,12 +254,6 @@ to 83.
 length(unique(stormDataTidy$EVTYPE))
 ```
 
-Preview a sample of the unique Event Types.
-
-```{r, echo = TRUE}
-stormDataTidy %>% distinct(EVTYPE) %>% sample_n(size=10) %>% arrange(EVTYPE)
-```
-
 ### Clean Date Data
 
 Format date variables for any type of optional reporting or further analysis.
@@ -278,18 +272,10 @@ Create four new variables based on date variables in the tidy dataset:
 | DURATION     | Duration (in hours) of the event              |
 
 ```{r, echo = TRUE}
-stormDataTidy$DATE_START <- as.POSIXct(stormDataTidy$BGN_DATE, format = "%Y-%m-%d")
-#stormDataTidy$DATE_END <- strptime(as.character(stormDataTidy$END_DATE), "%m/%d/%Y")
-#stormDataTidy$YEAR <- as.integer(format(stormDataTidy$DATE_START, "%Y"))
-#stormDataTidy$DURATION <- as.numeric(stormDataTidy$DATE_END - stormDataTidy$DATE_START)/3600
-```
-
-as.POSIXct(stormData$BGN_DATE, format = "%Y-%m-%d")
-
-Preview new date types.
-
-```{r, echo = TRUE}
-stormDataTidy %>% select(EVTYPE, DATE_START) %>% arrange(EVTYPE)
+stormDataTidy$DATE_START <- as.Date(stormDataTidy$BGN_DATE, format = "%m/%d/%Y")
+stormDataTidy$DATE_END <- as.Date(stormDataTidy$END_DATE, format = "%m/%d/%Y")
+stormDataTidy$YEAR <- as.integer(format(stormDataTidy$DATE_START, "%Y"))
+stormDataTidy$DURATION <- as.numeric(stormDataTidy$DATE_END - stormDataTidy$DATE_START)/3600
 ```
 
 ### Clean Economic Data
