@@ -12,7 +12,7 @@ Peer-graded Assignment: Course Project 2
 
     <a href="http://rpubs.com/OracleJavaNet">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
 
-* **Storm data analysis peport**
+* **Storm data analysis Report**
 
     <a href="http://htmlpreview.github.io/?https://github.com/oraclejavanet/reproducible-research-course-project-2/blob/master/storm-data-analysis.html">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
 
