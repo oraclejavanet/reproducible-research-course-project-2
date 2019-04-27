@@ -1,5 +1,5 @@
 ---
-title: "Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy"
+title: "Analysis of U.S. Storm Event Data and the Impact on Population Health and the Economy"
 author: "Jeffrey Hunter"
 date: "4/26/2019"
 output:
@@ -18,10 +18,9 @@ output:
 [Data Processing](#data-processing)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Create Subset of Data](#create-subset-of-data)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Event Type Data](#clean-event-type-data)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Economic Data](#clean-economic-data)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Date Data](#clean-date-data)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Impact on Public Health](#impact-on-public-health)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Impact on Economy](#impact-on-economy)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Economic Data](#clean-economic-data)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Summarize Data](#summarize-data)<br />
 [Results](#results)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types Most Harmful to Population Health](#event-types-most-harmful-to-population-health)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types with Greatest Economic Consequences](#event-types-with-greatest-economic-consequences)<br />
@@ -35,20 +34,16 @@ fatalities, injuries, and property damage, and preventing such outcomes to the
 extent possible is a key concern.
 
 This report contains the results of an analysis where the goal was to identify
-the most hazardous weather events with respect to public health and those with
-the greatest economic impact in the U.S. based on data collected from the U.S.
-National Oceanic and Atmospheric Administration's (NOAA).
+the most hazardous weather events with respect to population health and those
+with the greatest economic impact in the U.S. based on data collected from the
+U.S. National Oceanic and Atmospheric Administration's (NOAA).
 
 The storm database includes weather events from 1950 through the year 2011 and
 contains data estimates such as the number fatalities and injuries for each
 weather event as well as economic damage on properties and crops.
 
-The estimates for fatalities, injuries, property and crop damage was used
-to determine the most harmful impact to both public health and the economy.
-
-The results in this report found that tornadoes were most
-harmful with respect to public health, while floods had the greatest economic
-impact.
+The estimates for fatalities, injuries, property and crop damage were used
+to determine the most harmful impact to both population health and the economy.
 
 ## Set Up Environment
 
@@ -113,7 +108,7 @@ head(stormData)
 ### Create Subset of Data
 
 When processing a large dataset, compute performance can be improved by taking a
-subset of the variables associated to public health and economy damage. For
+subset of the variables associated to population health and economy damage. For
 this analysis, the dataset will be trimmed to only include the necessary
 variables (listed below). In addition, only observations with `value > 0` will
 be included.
@@ -362,29 +357,66 @@ stormDataTidy$CROP_COST <- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROP
 stormDataTidy$TOTAL_COST <- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST
 ```
 
-### Impact on Public Health
+### Summarize Data
 
-*pending*
-
-### Impact on Economy
-
-*pending*
+```{R, echo = TRUE}
+populationHealthData <- aggregate(x = list(healthImpact = stormDataTidy$FATALITIES + stormDataTidy$INJURIES), 
+                                  by = list(EVENT_TYPE = stormDataTidy$EVTYPE), 
+                                  FUN = sum,
+                                  na.rm = TRUE)
+populationHealthData <- populationHealthData[order(populationHealthData$healthImpact, decreasing = TRUE),]
+```
 
 ## Results
 
 ### Event Types Most Harmful to Population Health
 
-*pending*
+```{R, echo = TRUE}
+healthImpactChart <- ggplot(head(populationHealthData, 10),
+                            geom_bar(stat = "identity") + 
+                            aes(x = reorder(EVENT_TYPE, healthImpact), y = healthImpact, fill = EVENT_TYPE)) +
+                            coord_flip() +
+                            xlab("Event Type") +
+                            ylab("Total Fatalities and Injures") + 
+                            ggtitle("Top 10 Weather Events Most Harmful to Population Health in U.S.")
+print(healthImpactChart)
+```
+
 
 ### Event Types with Greatest Economic Consequences
 
-*pending*
+
 
 ## Conclusion
 
-*pending*
+Based on the evidence demonstrated in this analysis and supported by the
+included data and graphs, the following conclusions can be drawn:
+
+* **Which types of weather events are most harmful to population health?**
+
+Tornadoes are responsible for the greatest number of fatalities and injuries.
+
+* **Which types of weather events have the greatest economic consequences?**
+
+Floods are the weather event that cause most Property Damage, followed by hurricanes.
+
+Drought are the weather event that causes most crop damages, followed by flood.
 
 
+--------------
+From these data and graphs, we found that Tornado are most harmful with respect to population health, while Flood have the greatest economic consequences.
 
 
+The results in this report found that tornadoes were most
+harmful with respect to population health, while floods had the greatest economic
+impact.
 
+4.1 - Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
+
+Tornado was the most harmful weather event type in terms of population health.
+
+4.2 - Across the United States, which types of events have the greatest economic consequences?
+
+Flood was the worst weather event type in terms of economic consequences.
+
+The analysis shows Tornado was the most harmful weather event type in terms of population health while Flood was the weather event type had the worst economic impact.
