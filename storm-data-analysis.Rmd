@@ -46,9 +46,9 @@ weather event as well as economic damage on properties and crops.
 The estimates for fatalities, injuries, property and crop damage was used
 to determine the most harmful impact to both public health and the economy.
 
-The results in this report found that excessive heat and tornado were most
-harmful with respect to public health, while flood, drought, and
-hurricane/typhoon had the greatest economic impact.
+The results in this report found that tornadoes were most
+harmful with respect to public health, while floods had the greatest economic
+impact.
 
 ## Set Up Environment
 
@@ -118,18 +118,18 @@ this analysis, the dataset will be trimmed to only include the necessary
 variables (listed below). In addition, only observations with `value > 0` will
 be included.
 
-| Variable     | Description                                       |
-|--------------|---------------------------------------------------|
-| EVTYPE       | Event type (Flood, Heat, Hurricane, Tornado, ...) |
-| FATALITIES   | Number of fatalities resulting from event         |
-| INJURIES     | Number of injuries resulting from event           |
-| PROPDMG      | Property damage in USD                            |
-| PROPDMGEXP   | Units for property damage (K, M, or B)            |
-| CROPDMG      | Crop damage in USD                                |
-| CROPDMGEXP   | Unit for crop damage (K, M, or B)                 |
-| BGN_DATE     | Begin date of the event                           |
-| END_DATE     | End date of the event                             |
-| STATE        | State where the event occurred                    |
+| Variable     | Description                                                |
+|--------------|------------------------------------------------------------|
+| EVTYPE       | Event type (Flood, Heat, Hurricane, Tornado, ...)          |
+| FATALITIES   | Number of fatalities resulting from event                  |
+| INJURIES     | Number of injuries resulting from event                    |
+| PROPDMG      | Property damage in USD                                     |
+| PROPDMGEXP   | Unit multiplier for property damage (-, +, H, K, M, or B)  |
+| CROPDMG      | Crop damage in USD                                         |
+| CROPDMGEXP   | Unit multiplier for property damage (-, +, H, K, M, or B)  |
+| BGN_DATE     | Begin date of the event                                    |
+| END_DATE     | End date of the event                                      |
+| STATE        | State where the event occurred                             |
 
 ```{r, echo = TRUE}
 stormDataTidy <- subset(stormData, EVTYPE != "?"
@@ -247,6 +247,7 @@ stormDataTidy$EVTYPE <- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
 # TORNADO
 stormDataTidy$EVTYPE <- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*LANDSPOUT.*', 'TORNADO', stormDataTidy$EVTYPE)
 
 # SURF
 stormDataTidy$EVTYPE <- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
@@ -302,7 +303,64 @@ stormDataTidy$DURATION <- as.numeric(stormDataTidy$DATE_END - stormDataTidy$DATE
 
 ### Clean Economic Data
 
-*Pending*
+According to the
+"National Weather Service [Storm Data Documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf)"
+(page 12), information about Property Damage is logged using two variables:
+`PROPDMG` and `PROPDMGEXP`. `PROPDMG` is the mantissa (significand) rounded to
+three significant digits and `PROPDMGEXP` is the exponent (the multiplier). The
+same approach is used for Crop Damage where the `CROPDMG` variable is encoded by
+the `CROPDMGEXP` variable.
+
+The documentation also specifies that the `PROPDMGEXP` and `CROPDMGEXP` are
+supposed to contain an alphabetical character used to signify magnitude and
+includes "K" for thousands, "M" for millions, and "B" for billions. A quick
+review of the data, however, shows that there are several other characters
+being logged.
+
+```{R, echo = TRUE}
+table(toupper(stormDataTidy$PROPDMGEXP))
+table(toupper(stormDataTidy$CROPDMGEXP))
+```
+
+In order to calculate costs, the `PROPDMGEXP` and `CROPDMGEXP` variables
+will be mapped to a multiplier factor which will then be used to calculate the
+actual costs of both property and crop damage. Three new variables will be
+created to store damage costs:
+
+* PROP_COST
+* CROP_COST
+* TOTAL_COST
+
+```{R, echo = TRUE}
+# function to get multiplier factor
+getMultiplier <- function(exp) {
+    exp <- toupper(exp);
+    if (exp == "")  return (10^0);
+    if (exp == "-") return (10^0);
+    if (exp == "?") return (10^0);
+    if (exp == "+") return (10^0);
+    if (exp == "0") return (10^0);
+    if (exp == "1") return (10^1);
+    if (exp == "2") return (10^2);
+    if (exp == "3") return (10^3);
+    if (exp == "4") return (10^4);
+    if (exp == "5") return (10^5);
+    if (exp == "6") return (10^6);
+    if (exp == "7") return (10^7);
+    if (exp == "8") return (10^8);
+    if (exp == "9") return (10^9);
+    if (exp == "H") return (10^2);
+    if (exp == "K") return (10^3);
+    if (exp == "M") return (10^6);
+    if (exp == "B") return (10^9);
+    return (NA);
+}
+
+# calculate property damage and crop damage costs
+stormDataTidy$PROP_COST <- with(stormDataTidy, as.numeric(PROPDMG) * sapply(PROPDMGEXP, getMultiplier))
+stormDataTidy$CROP_COST <- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROPDMGEXP, getMultiplier))
+stormDataTidy$TOTAL_COST <- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST
+```
 
 ### Impact on Public Health
 

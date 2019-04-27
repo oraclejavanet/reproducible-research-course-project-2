@@ -208,7 +208,7 @@ $(document).ready(function () {
 <p>This report contains the results of an analysis where the goal was to identify the most hazardous weather events with respect to public health and those with the greatest economic impact in the U.S. based on data collected from the U.S. National Oceanic and Atmospheric Administration’s (NOAA).</p>
 <p>The storm database includes weather events from 1950 through the year 2011 and contains data estimates such as the number fatalities and injuries for each weather event as well as economic damage on properties and crops.</p>
 <p>The estimates for fatalities, injuries, property and crop damage was used to determine the most harmful impact to both public health and the economy.</p>
-<p>The results in this report found that excessive heat and tornado were most harmful with respect to public health, while flood, drought, and hurricane/typhoon had the greatest economic impact.</p>
+<p>The results in this report found that tornadoes were most harmful with respect to public health, while floods had the greatest economic impact.</p>
 </div>
 <div id="set-up-environment" class="section level2">
 <h2>Set Up Environment</h2>
@@ -349,7 +349,7 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 </tr>
 <tr class="odd">
 <td>PROPDMGEXP</td>
-<td>Units for property damage (K, M, or B)</td>
+<td>Unit multiplier for property damage (-, +, H, K, M, or B)</td>
 </tr>
 <tr class="even">
 <td>CROPDMG</td>
@@ -357,7 +357,7 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 </tr>
 <tr class="odd">
 <td>CROPDMGEXP</td>
-<td>Unit for crop damage (K, M, or B)</td>
+<td>Unit multiplier for property damage (-, +, H, K, M, or B)</td>
 </tr>
 <tr class="even">
 <td>BGN_DATE</td>
@@ -474,6 +474,7 @@ stormDataTidy$EVTYPE &lt;- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
 # TORNADO
 stormDataTidy$EVTYPE &lt;- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*LANDSPOUT.*', 'TORNADO', stormDataTidy$EVTYPE)
 
 # SURF
 stormDataTidy$EVTYPE &lt;- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
@@ -496,7 +497,7 @@ stormDataTidy$EVTYPE &lt;- gsub('.*WINTRY.*', 'WINTER', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)</code></pre>
 <p>After tidying the dataset, the number of unique Event Type values were reduced to 83.</p>
 <pre class="r"><code>length(unique(stormDataTidy$EVTYPE))</code></pre>
-<pre><code>## [1] 83</code></pre>
+<pre><code>## [1] 82</code></pre>
 </div>
 <div id="clean-date-data" class="section level3">
 <h3>Clean Date Data</h3>
@@ -536,7 +537,52 @@ stormDataTidy$DURATION &lt;- as.numeric(stormDataTidy$DATE_END - stormDataTidy$D
 </div>
 <div id="clean-economic-data" class="section level3">
 <h3>Clean Economic Data</h3>
-<p><em>Pending</em></p>
+<p>According to the “National Weather Service <a href="https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf">Storm Data Documentation</a>” (page 12), information about Property Damage is logged using two variables: <code>PROPDMG</code> and <code>PROPDMGEXP</code>. <code>PROPDMG</code> is the mantissa (significand) rounded to three significant digits and <code>PROPDMGEXP</code> is the exponent (the multiplier). The same approach is used for Crop Damage where the <code>CROPDMG</code> variable is encoded by the <code>CROPDMGEXP</code> variable.</p>
+<p>The documentation also specifies that the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> are supposed to contain an alphabetical character used to signify magnitude and includes “K” for thousands, “M” for millions, and “B” for billions. A quick review of the data, however, shows that there are several other characters being logged.</p>
+<pre class="r"><code>table(toupper(stormDataTidy$PROPDMGEXP))</code></pre>
+<pre><code>## 
+##             -      +      0      2      3      4      5      6      7 
+##  11585      1      5    210      1      1      4     18      3      3 
+##      B      H      K      M 
+##     40      7 231427  11327</code></pre>
+<pre class="r"><code>table(toupper(stormDataTidy$CROPDMGEXP))</code></pre>
+<pre><code>## 
+##             ?      0      B      K      M 
+## 152663      6     17      7  99953   1986</code></pre>
+<p>In order to calculate costs, the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> variables will be mapped to a multiplier factor which will then be used to calculate the actual costs of both property and crop damage. Three new variables will be created to store damage costs:</p>
+<ul>
+<li>PROP_COST</li>
+<li>CROP_COST</li>
+<li>TOTAL_COST</li>
+</ul>
+<pre class="r"><code># function to get multiplier factor
+getMultiplier &lt;- function(exp) {
+    exp &lt;- toupper(exp);
+    if (exp == &quot;&quot;)  return (10^0);
+    if (exp == &quot;-&quot;) return (10^0);
+    if (exp == &quot;?&quot;) return (10^0);
+    if (exp == &quot;+&quot;) return (10^0);
+    if (exp == &quot;0&quot;) return (10^0);
+    if (exp == &quot;1&quot;) return (10^1);
+    if (exp == &quot;2&quot;) return (10^2);
+    if (exp == &quot;3&quot;) return (10^3);
+    if (exp == &quot;4&quot;) return (10^4);
+    if (exp == &quot;5&quot;) return (10^5);
+    if (exp == &quot;6&quot;) return (10^6);
+    if (exp == &quot;7&quot;) return (10^7);
+    if (exp == &quot;8&quot;) return (10^8);
+    if (exp == &quot;9&quot;) return (10^9);
+    if (exp == &quot;H&quot;) return (10^2);
+    if (exp == &quot;K&quot;) return (10^3);
+    if (exp == &quot;M&quot;) return (10^6);
+    if (exp == &quot;B&quot;) return (10^9);
+    return (NA);
+}
+
+# calculate property damage and crop damage costs
+stormDataTidy$PROP_COST &lt;- with(stormDataTidy, as.numeric(PROPDMG) * sapply(PROPDMGEXP, getMultiplier))
+stormDataTidy$CROP_COST &lt;- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROPDMGEXP, getMultiplier))
+stormDataTidy$TOTAL_COST &lt;- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST</code></pre>
 </div>
 <div id="impact-on-public-health" class="section level3">
 <h3>Impact on Public Health</h3>
