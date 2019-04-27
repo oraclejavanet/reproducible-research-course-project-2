@@ -193,30 +193,25 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</h1>
 <h4 class="author">Jeffrey Hunter</h4>
-<h4 class="date">4/24/2019</h4>
+<h4 class="date">4/26/2019</h4>
 
 </div>
 
 
 <div id="table-of-contents" class="section level2">
 <h2>Table of Contents</h2>
-<p><a href="#synonpsis">Synonpsis</a><br /> <a href="#set-up-environment">Set up environment</a><br /> <a href="#load-data">Load Data</a><br /> <a href="#data-processing">Data Processing</a><br />          <a href="#impact-on-public-health">Impact on Public Health</a><br />          <a href="#impact-on-economy">Impact on Economy</a><br /> <a href="#results">Results</a><br />          <a href="#event-types-most-harmful-to-population-health">Event Types Most Harmful to Population Health</a><br />          <a href="#event-types-with-greatest-economic-consequences">Event Types with Greatest Economic Consequences</a><br /> <a href="#conclusion">Conclusion</a></p>
+<p><a href="#synonpsis">Synonpsis</a><br /> <a href="#set-up-environment">Set Up Environment</a><br /> <a href="#load-data">Load Data</a><br /> <a href="#data-processing">Data Processing</a><br />          <a href="#create-subset-of-data">Create Subset of Data</a><br />          <a href="#clean-event-type-data">Clean Event Type Data</a><br />          <a href="#clean-economic-data">Clean Economic Data</a><br />          <a href="#clean-date-data">Clean Date Data</a><br />          <a href="#impact-on-public-health">Impact on Public Health</a><br />          <a href="#impact-on-economy">Impact on Economy</a><br /> <a href="#results">Results</a><br />          <a href="#event-types-most-harmful-to-population-health">Event Types Most Harmful to Population Health</a><br />          <a href="#event-types-with-greatest-economic-consequences">Event Types with Greatest Economic Consequences</a><br /> <a href="#conclusion">Conclusion</a></p>
 </div>
 <div id="synonpsis" class="section level2">
 <h2>Synonpsis</h2>
-<p>The goal for this report is to identify the most harmful weather events with respect to public health and those with the greatest economic impact in the United States.</p>
-<p>This report contains the results of an analysis performed on storm data collected from the U.S. National Oceanic and Atmospheric Administration’s (NOAA). The goal for the analysis was to determine the impact of different weather events on both public health and the economy based on the storm database.</p>
-<p>The storm database contains weather events from January 1950 through November 2011 and includes weather event data such as when and where they occurred,</p>
-<p>In this report, we aim to analyze the impact of different weather events on public health and economy based on the storm database collected from the U.S. National Oceanic and Atmospheric Administration’s (NOAA) from 1950 - 2011. We will use the estimates of fatalities, injuries, property and crop damage to decide which types of event are most harmful to the population health and economy. From these data, we found that excessive heat and tornado are most harmful with respect to population health, while flood, drought, and hurricane/typhoon have the greatest economic consequences.</p>
-<p>Storms and other severe weather events can cause both public health and economic problems for communities and municipalities.</p>
-<p>This report contains the results of an analysis performed on historical data about severe weather events in the U.S. from 1950 to November 2011.</p>
-<p>analysis contains the results of a study of</p>
-<p>This goal for this report is to analyze several weather events in the United States between the years 1950 and 2011</p>
 <p>Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.</p>
-<p>This project involves exploring the U.S. National Oceanic and Atmospheric Administration’s (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.</p>
+<p>This report contains the results of an analysis where the goal was to identify the most hazardous weather events with respect to public health and those with the greatest economic impact in the U.S. based on data collected from the U.S. National Oceanic and Atmospheric Administration’s (NOAA).</p>
+<p>The storm database includes weather events from 1950 through the year 2011 and contains data estimates such as the number fatalities and injuries for each weather event as well as economic damage on properties and crops.</p>
+<p>The estimates for fatalities, injuries, property and crop damage was used to determine the most harmful impact to both public health and the economy.</p>
+<p>The results in this report found that tornadoes were most harmful with respect to public health, while floods had the greatest economic impact.</p>
 </div>
 <div id="set-up-environment" class="section level2">
-<h2>Set up environment</h2>
+<h2>Set Up Environment</h2>
 <p>Disable warnings</p>
 <pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)</code></pre>
 <p>Load libraries</p>
@@ -264,7 +259,7 @@ if (!file.exists('data')) {
 if (!file.exists(stormDataFile)) {
     download.file(url = stormDataFileURL, destfile = stormDataFile)
 }
-stormData &lt;- read.csv(stormDataFile, sep = &quot;,&quot;)
+stormData &lt;- read.csv(stormDataFile, sep = &quot;,&quot;, header = TRUE)
 stopifnot(file.size(stormDataFile) == 49177144) 
 stopifnot(dim(stormData) == c(902297,37))</code></pre>
 <p>Display dataset summary</p>
@@ -316,103 +311,6 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 ##  $ LONGITUDE_: num  8806 0 0 0 0 ...
 ##  $ REMARKS   : Factor w/ 436781 levels &quot;&quot;,&quot;\t&quot;,&quot;\t\t&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ REFNUM    : num  1 2 3 4 5 6 7 8 9 10 ...</code></pre>
-<pre class="r"><code>summary(stormData)</code></pre>
-<pre><code>##     STATE__                  BGN_DATE             BGN_TIME     
-##  Min.   : 1.0   5/25/2011 0:00:00:  1202   12:00:00 AM: 10163  
-##  1st Qu.:19.0   4/27/2011 0:00:00:  1193   06:00:00 PM:  7350  
-##  Median :30.0   6/9/2011 0:00:00 :  1030   04:00:00 PM:  7261  
-##  Mean   :31.2   5/30/2004 0:00:00:  1016   05:00:00 PM:  6891  
-##  3rd Qu.:45.0   4/4/2011 0:00:00 :  1009   12:00:00 PM:  6703  
-##  Max.   :95.0   4/2/2006 0:00:00 :   981   03:00:00 PM:  6700  
-##                 (Other)          :895866   (Other)    :857229  
-##    TIME_ZONE          COUNTY           COUNTYNAME         STATE       
-##  CST    :547493   Min.   :  0.0   JEFFERSON :  7840   TX     : 83728  
-##  EST    :245558   1st Qu.: 31.0   WASHINGTON:  7603   KS     : 53440  
-##  MST    : 68390   Median : 75.0   JACKSON   :  6660   OK     : 46802  
-##  PST    : 28302   Mean   :100.6   FRANKLIN  :  6256   MO     : 35648  
-##  AST    :  6360   3rd Qu.:131.0   LINCOLN   :  5937   IA     : 31069  
-##  HST    :  2563   Max.   :873.0   MADISON   :  5632   NE     : 30271  
-##  (Other):  3631                   (Other)   :862369   (Other):621339  
-##                EVTYPE         BGN_RANGE           BGN_AZI      
-##  HAIL             :288661   Min.   :   0.000          :547332  
-##  TSTM WIND        :219940   1st Qu.:   0.000   N      : 86752  
-##  THUNDERSTORM WIND: 82563   Median :   0.000   W      : 38446  
-##  TORNADO          : 60652   Mean   :   1.484   S      : 37558  
-##  FLASH FLOOD      : 54277   3rd Qu.:   1.000   E      : 33178  
-##  FLOOD            : 25326   Max.   :3749.000   NW     : 24041  
-##  (Other)          :170878                      (Other):134990  
-##          BGN_LOCATI                  END_DATE             END_TIME     
-##               :287743                    :243411              :238978  
-##  COUNTYWIDE   : 19680   4/27/2011 0:00:00:  1214   06:00:00 PM:  9802  
-##  Countywide   :   993   5/25/2011 0:00:00:  1196   05:00:00 PM:  8314  
-##  SPRINGFIELD  :   843   6/9/2011 0:00:00 :  1021   04:00:00 PM:  8104  
-##  SOUTH PORTION:   810   4/4/2011 0:00:00 :  1007   12:00:00 PM:  7483  
-##  NORTH PORTION:   784   5/30/2004 0:00:00:   998   11:59:00 PM:  7184  
-##  (Other)      :591444   (Other)          :653450   (Other)    :622432  
-##    COUNTY_END COUNTYENDN       END_RANGE           END_AZI      
-##  Min.   :0    Mode:logical   Min.   :  0.0000          :724837  
-##  1st Qu.:0    NA's:902297    1st Qu.:  0.0000   N      : 28082  
-##  Median :0                   Median :  0.0000   S      : 22510  
-##  Mean   :0                   Mean   :  0.9862   W      : 20119  
-##  3rd Qu.:0                   3rd Qu.:  0.0000   E      : 20047  
-##  Max.   :0                   Max.   :925.0000   NE     : 14606  
-##                                                 (Other): 72096  
-##            END_LOCATI         LENGTH              WIDTH         
-##                 :499225   Min.   :   0.0000   Min.   :   0.000  
-##  COUNTYWIDE     : 19731   1st Qu.:   0.0000   1st Qu.:   0.000  
-##  SOUTH PORTION  :   833   Median :   0.0000   Median :   0.000  
-##  NORTH PORTION  :   780   Mean   :   0.2301   Mean   :   7.503  
-##  CENTRAL PORTION:   617   3rd Qu.:   0.0000   3rd Qu.:   0.000  
-##  SPRINGFIELD    :   575   Max.   :2315.0000   Max.   :4400.000  
-##  (Other)        :380536                                         
-##        F               MAG            FATALITIES          INJURIES        
-##  Min.   :0.0      Min.   :    0.0   Min.   :  0.0000   Min.   :   0.0000  
-##  1st Qu.:0.0      1st Qu.:    0.0   1st Qu.:  0.0000   1st Qu.:   0.0000  
-##  Median :1.0      Median :   50.0   Median :  0.0000   Median :   0.0000  
-##  Mean   :0.9      Mean   :   46.9   Mean   :  0.0168   Mean   :   0.1557  
-##  3rd Qu.:1.0      3rd Qu.:   75.0   3rd Qu.:  0.0000   3rd Qu.:   0.0000  
-##  Max.   :5.0      Max.   :22000.0   Max.   :583.0000   Max.   :1700.0000  
-##  NA's   :843563                                                           
-##     PROPDMG          PROPDMGEXP        CROPDMG          CROPDMGEXP    
-##  Min.   :   0.00          :465934   Min.   :  0.000          :618413  
-##  1st Qu.:   0.00   K      :424665   1st Qu.:  0.000   K      :281832  
-##  Median :   0.00   M      : 11330   Median :  0.000   M      :  1994  
-##  Mean   :  12.06   0      :   216   Mean   :  1.527   k      :    21  
-##  3rd Qu.:   0.50   B      :    40   3rd Qu.:  0.000   0      :    19  
-##  Max.   :5000.00   5      :    28   Max.   :990.000   B      :     9  
-##                    (Other):    84                     (Other):     9  
-##       WFO                                       STATEOFFIC    
-##         :142069                                      :248769  
-##  OUN    : 17393   TEXAS, North                       : 12193  
-##  JAN    : 13889   ARKANSAS, Central and North Central: 11738  
-##  LWX    : 13174   IOWA, Central                      : 11345  
-##  PHI    : 12551   KANSAS, Southwest                  : 11212  
-##  TSA    : 12483   GEORGIA, North and Central         : 11120  
-##  (Other):690738   (Other)                            :595920  
-##                                                                                                                                                                                                     ZONENAMES     
-##                                                                                                                                                                                                          :594029  
-##                                                                                                                                                                                                          :205988  
-##  GREATER RENO / CARSON CITY / M - GREATER RENO / CARSON CITY / M                                                                                                                                         :   639  
-##  GREATER LAKE TAHOE AREA - GREATER LAKE TAHOE AREA                                                                                                                                                       :   592  
-##  JEFFERSON - JEFFERSON                                                                                                                                                                                   :   303  
-##  MADISON - MADISON                                                                                                                                                                                       :   302  
-##  (Other)                                                                                                                                                                                                 :100444  
-##     LATITUDE      LONGITUDE        LATITUDE_E     LONGITUDE_    
-##  Min.   :   0   Min.   :-14451   Min.   :   0   Min.   :-14455  
-##  1st Qu.:2802   1st Qu.:  7247   1st Qu.:   0   1st Qu.:     0  
-##  Median :3540   Median :  8707   Median :   0   Median :     0  
-##  Mean   :2875   Mean   :  6940   Mean   :1452   Mean   :  3509  
-##  3rd Qu.:4019   3rd Qu.:  9605   3rd Qu.:3549   3rd Qu.:  8735  
-##  Max.   :9706   Max.   : 17124   Max.   :9706   Max.   :106220  
-##  NA's   :47                      NA's   :40                     
-##                                            REMARKS           REFNUM      
-##                                                :287433   Min.   :     1  
-##                                                : 24013   1st Qu.:225575  
-##  Trees down.\n                                 :  1110   Median :451149  
-##  Several trees were blown down.\n              :   568   Mean   :451149  
-##  Trees were downed.\n                          :   446   3rd Qu.:676723  
-##  Large trees and power lines were blown down.\n:   432   Max.   :902297  
-##  (Other)                                       :588295</code></pre>
 <pre class="r"><code>head(stormData)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -422,9 +320,270 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 </div>
 <div id="data-processing" class="section level2">
 <h2>Data Processing</h2>
+<div id="create-subset-of-data" class="section level3">
+<h3>Create Subset of Data</h3>
+<p>When processing a large dataset, compute performance can be improved by taking a subset of the variables associated to public health and economy damage. For this analysis, the dataset will be trimmed to only include the necessary variables (listed below). In addition, only observations with <code>value &gt; 0</code> will be included.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>EVTYPE</td>
+<td>Event type (Flood, Heat, Hurricane, Tornado, …)</td>
+</tr>
+<tr class="even">
+<td>FATALITIES</td>
+<td>Number of fatalities resulting from event</td>
+</tr>
+<tr class="odd">
+<td>INJURIES</td>
+<td>Number of injuries resulting from event</td>
+</tr>
+<tr class="even">
+<td>PROPDMG</td>
+<td>Property damage in USD</td>
+</tr>
+<tr class="odd">
+<td>PROPDMGEXP</td>
+<td>Unit multiplier for property damage (-, +, H, K, M, or B)</td>
+</tr>
+<tr class="even">
+<td>CROPDMG</td>
+<td>Crop damage in USD</td>
+</tr>
+<tr class="odd">
+<td>CROPDMGEXP</td>
+<td>Unit multiplier for property damage (-, +, H, K, M, or B)</td>
+</tr>
+<tr class="even">
+<td>BGN_DATE</td>
+<td>Begin date of the event</td>
+</tr>
+<tr class="odd">
+<td>END_DATE</td>
+<td>End date of the event</td>
+</tr>
+<tr class="even">
+<td>STATE</td>
+<td>State where the event occurred</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>stormDataTidy &lt;- subset(stormData, EVTYPE != &quot;?&quot;
+                                   &amp;
+                                   (FATALITIES &gt; 0 | INJURIES &gt; 0 | PROPDMG &gt; 0 | CROPDMG &gt; 0),
+                                   select = c(&quot;EVTYPE&quot;,
+                                              &quot;FATALITIES&quot;,
+                                              &quot;INJURIES&quot;, 
+                                              &quot;PROPDMG&quot;,
+                                              &quot;PROPDMGEXP&quot;,
+                                              &quot;CROPDMG&quot;,
+                                              &quot;CROPDMGEXP&quot;,
+                                              &quot;BGN_DATE&quot;,
+                                              &quot;END_DATE&quot;,
+                                              &quot;STATE&quot;))
+dim(stormDataTidy)</code></pre>
+<pre><code>## [1] 254632     10</code></pre>
+<pre class="r"><code>sum(is.na(stormDataTidy))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>The working (tidy) dataset contains 254632 observations, 10 variables and no missing values.</p>
 </div>
-<div id="stormdatabgn_date---as.datestormdatabgn_date-format-mdy" class="section level1">
-<h1>stormData<span class="math inline">\(BGN_DATE &lt;- as.Date(stormData\)</span>BGN_DATE, format = “%m/%d/%Y”)</h1>
+<div id="clean-event-type-data" class="section level3">
+<h3>Clean Event Type Data</h3>
+<p>There are a total of 487 unique Event Type values in the current tidy dataset.</p>
+<pre class="r"><code>length(unique(stormDataTidy$EVTYPE))</code></pre>
+<pre><code>## [1] 487</code></pre>
+<p>Exploring the Event Type data revealed many values that appeared to be similar; however, they were entered with different spellings, pluralization, mixed case and even misspellings. For example, <code>Strong Wind</code>, <code>STRONG WIND</code>, <code>Strong Winds</code>, and <code>STRONG WINDS</code>.</p>
+<p>The dataset was normalized by converting all Event Type values to uppercase and combining similar Event Type values into unique categories.</p>
+<pre class="r"><code>stormDataTidy$EVTYPE &lt;- toupper(stormDataTidy$EVTYPE)</code></pre>
+<pre class="r"><code># AVALANCHE
+stormDataTidy$EVTYPE &lt;- gsub('.*AVALANCE.*', 'AVALANCHE', stormDataTidy$EVTYPE)
+
+# BLIZZARD
+stormDataTidy$EVTYPE &lt;- gsub('.*BLIZZARD.*', 'BLIZZARD', stormDataTidy$EVTYPE)
+
+# CLOUD
+stormDataTidy$EVTYPE &lt;- gsub('.*CLOUD.*', 'CLOUD', stormDataTidy$EVTYPE)
+
+# COLD
+stormDataTidy$EVTYPE &lt;- gsub('.*COLD.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*FREEZ.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*FROST.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*ICE.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*LOW TEMPERATURE RECORD.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*LO.*TEMP.*', 'COLD', stormDataTidy$EVTYPE)
+
+# DRY
+stormDataTidy$EVTYPE &lt;- gsub('.*DRY.*', 'DRY', stormDataTidy$EVTYPE)
+
+# DUST
+stormDataTidy$EVTYPE &lt;- gsub('.*DUST.*', 'DUST', stormDataTidy$EVTYPE)
+
+# FIRE
+stormDataTidy$EVTYPE &lt;- gsub('.*FIRE.*', 'FIRE', stormDataTidy$EVTYPE)
+
+# FLOOD
+stormDataTidy$EVTYPE &lt;- gsub('.*FLOOD.*', 'FLOOD', stormDataTidy$EVTYPE)
+
+# FOG
+stormDataTidy$EVTYPE &lt;- gsub('.*FOG.*', 'FOG', stormDataTidy$EVTYPE)
+
+# HAIL
+stormDataTidy$EVTYPE &lt;- gsub('.*HAIL.*', 'HAIL', stormDataTidy$EVTYPE)
+
+# HEAT
+stormDataTidy$EVTYPE &lt;- gsub('.*HEAT.*', 'HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*WARM.*', 'HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*HIGH.*TEMP.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*RECORD HIGH TEMPERATURES.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
+
+# HYPOTHERMIA/EXPOSURE
+stormDataTidy$EVTYPE &lt;- gsub('.*HYPOTHERMIA.*', 'HYPOTHERMIA/EXPOSURE', stormDataTidy$EVTYPE)
+
+# LANDSLIDE
+stormDataTidy$EVTYPE &lt;- gsub('.*LANDSLIDE.*', 'LANDSLIDE', stormDataTidy$EVTYPE)
+
+# LIGHTNING
+stormDataTidy$EVTYPE &lt;- gsub('^LIGHTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('^LIGNTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('^LIGHTING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
+
+# MICROBURST
+stormDataTidy$EVTYPE &lt;- gsub('.*MICROBURST.*', 'MICROBURST', stormDataTidy$EVTYPE)
+
+# MUDSLIDE
+stormDataTidy$EVTYPE &lt;- gsub('^MUDSLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('^MUD SLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
+
+# RAIN
+stormDataTidy$EVTYPE &lt;- gsub('.*RAIN.*', 'RAIN', stormDataTidy$EVTYPE)
+
+# RIP CURRENT
+stormDataTidy$EVTYPE &lt;- gsub('.*RIP CURRENT.*', 'RIP CURRENT', stormDataTidy$EVTYPE)
+
+# STORM
+stormDataTidy$EVTYPE &lt;- gsub('.*STORM.*', 'STORM', stormDataTidy$EVTYPE)
+
+# SUMMARY
+stormDataTidy$EVTYPE &lt;- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
+
+# TORNADO
+stormDataTidy$EVTYPE &lt;- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*LANDSPOUT.*', 'TORNADO', stormDataTidy$EVTYPE)
+
+# SURF
+stormDataTidy$EVTYPE &lt;- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
+
+# VOLCANIC
+stormDataTidy$EVTYPE &lt;- gsub('.*VOLCANIC.*', 'VOLCANIC', stormDataTidy$EVTYPE)
+
+# WATERSPOUT
+stormDataTidy$EVTYPE &lt;- gsub('.*WATERSPOUT.*', 'WATERSPOUT', stormDataTidy$EVTYPE)
+
+# WET
+stormDataTidy$EVTYPE &lt;- gsub('.*WET.*', 'WET', stormDataTidy$EVTYPE)
+
+# WIND
+stormDataTidy$EVTYPE &lt;- gsub('.*WIND.*', 'WIND', stormDataTidy$EVTYPE)
+
+# WINTER
+stormDataTidy$EVTYPE &lt;- gsub('.*WINTER.*', 'WINTER', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*WINTRY.*', 'WINTER', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE &lt;- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)</code></pre>
+<p>After tidying the dataset, the number of unique Event Type values were reduced to 83.</p>
+<pre class="r"><code>length(unique(stormDataTidy$EVTYPE))</code></pre>
+<pre><code>## [1] 82</code></pre>
+</div>
+<div id="clean-date-data" class="section level3">
+<h3>Clean Date Data</h3>
+<p>Format date variables for any type of optional reporting or further analysis.</p>
+<p>In the raw dataset, the <code>BNG_START</code> and <code>END_DATE</code> variables are stored as factors which should be made available as actual <em>date</em> types that can be manipulated and reported on. For now, time variables will be ignored.</p>
+<p>Create four new variables based on date variables in the tidy dataset:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DATE_START</td>
+<td>Begin date of the event stored as a date type</td>
+</tr>
+<tr class="even">
+<td>DATE_END</td>
+<td>End date of the event stored as a date type</td>
+</tr>
+<tr class="odd">
+<td>YEAR</td>
+<td>Year the event started</td>
+</tr>
+<tr class="even">
+<td>DURATION</td>
+<td>Duration (in hours) of the event</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>stormDataTidy$DATE_START &lt;- as.Date(stormDataTidy$BGN_DATE, format = &quot;%m/%d/%Y&quot;)
+stormDataTidy$DATE_END &lt;- as.Date(stormDataTidy$END_DATE, format = &quot;%m/%d/%Y&quot;)
+stormDataTidy$YEAR &lt;- as.integer(format(stormDataTidy$DATE_START, &quot;%Y&quot;))
+stormDataTidy$DURATION &lt;- as.numeric(stormDataTidy$DATE_END - stormDataTidy$DATE_START)/3600</code></pre>
+</div>
+<div id="clean-economic-data" class="section level3">
+<h3>Clean Economic Data</h3>
+<p>According to the “National Weather Service <a href="https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf">Storm Data Documentation</a>” (page 12), information about Property Damage is logged using two variables: <code>PROPDMG</code> and <code>PROPDMGEXP</code>. <code>PROPDMG</code> is the mantissa (significand) rounded to three significant digits and <code>PROPDMGEXP</code> is the exponent (the multiplier). The same approach is used for Crop Damage where the <code>CROPDMG</code> variable is encoded by the <code>CROPDMGEXP</code> variable.</p>
+<p>The documentation also specifies that the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> are supposed to contain an alphabetical character used to signify magnitude and includes “K” for thousands, “M” for millions, and “B” for billions. A quick review of the data, however, shows that there are several other characters being logged.</p>
+<pre class="r"><code>table(toupper(stormDataTidy$PROPDMGEXP))</code></pre>
+<pre><code>## 
+##             -      +      0      2      3      4      5      6      7 
+##  11585      1      5    210      1      1      4     18      3      3 
+##      B      H      K      M 
+##     40      7 231427  11327</code></pre>
+<pre class="r"><code>table(toupper(stormDataTidy$CROPDMGEXP))</code></pre>
+<pre><code>## 
+##             ?      0      B      K      M 
+## 152663      6     17      7  99953   1986</code></pre>
+<p>In order to calculate costs, the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> variables will be mapped to a multiplier factor which will then be used to calculate the actual costs of both property and crop damage. Three new variables will be created to store damage costs:</p>
+<ul>
+<li>PROP_COST</li>
+<li>CROP_COST</li>
+<li>TOTAL_COST</li>
+</ul>
+<pre class="r"><code># function to get multiplier factor
+getMultiplier &lt;- function(exp) {
+    exp &lt;- toupper(exp);
+    if (exp == &quot;&quot;)  return (10^0);
+    if (exp == &quot;-&quot;) return (10^0);
+    if (exp == &quot;?&quot;) return (10^0);
+    if (exp == &quot;+&quot;) return (10^0);
+    if (exp == &quot;0&quot;) return (10^0);
+    if (exp == &quot;1&quot;) return (10^1);
+    if (exp == &quot;2&quot;) return (10^2);
+    if (exp == &quot;3&quot;) return (10^3);
+    if (exp == &quot;4&quot;) return (10^4);
+    if (exp == &quot;5&quot;) return (10^5);
+    if (exp == &quot;6&quot;) return (10^6);
+    if (exp == &quot;7&quot;) return (10^7);
+    if (exp == &quot;8&quot;) return (10^8);
+    if (exp == &quot;9&quot;) return (10^9);
+    if (exp == &quot;H&quot;) return (10^2);
+    if (exp == &quot;K&quot;) return (10^3);
+    if (exp == &quot;M&quot;) return (10^6);
+    if (exp == &quot;B&quot;) return (10^9);
+    return (NA);
+}
+
+# calculate property damage and crop damage costs
+stormDataTidy$PROP_COST &lt;- with(stormDataTidy, as.numeric(PROPDMG) * sapply(PROPDMGEXP, getMultiplier))
+stormDataTidy$CROP_COST &lt;- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROPDMGEXP, getMultiplier))
+stormDataTidy$TOTAL_COST &lt;- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST</code></pre>
+</div>
 <div id="impact-on-public-health" class="section level3">
 <h3>Impact on Public Health</h3>
 <p><em>pending</em></p>
@@ -432,6 +591,7 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 <div id="impact-on-economy" class="section level3">
 <h3>Impact on Economy</h3>
 <p><em>pending</em></p>
+</div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
@@ -447,7 +607,6 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p><em>pending</em></p>
-</div>
 </div>
 
 

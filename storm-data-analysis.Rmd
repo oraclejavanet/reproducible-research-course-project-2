@@ -1,7 +1,7 @@
 ---
 title: "Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy"
 author: "Jeffrey Hunter"
-date: "4/24/2019"
+date: "4/26/2019"
 output:
   html_document:
     df_print: paged
@@ -13,9 +13,13 @@ output:
 ## Table of Contents
 
 [Synonpsis](#synonpsis)<br />
-[Set up environment](#set-up-environment)<br />
+[Set Up Environment](#set-up-environment)<br />
 [Load Data](#load-data)<br />
 [Data Processing](#data-processing)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Create Subset of Data](#create-subset-of-data)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Event Type Data](#clean-event-type-data)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Economic Data](#clean-economic-data)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Date Data](#clean-date-data)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Impact on Public Health](#impact-on-public-health)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Impact on Economy](#impact-on-economy)<br />
 [Results](#results)<br />
@@ -42,11 +46,11 @@ weather event as well as economic damage on properties and crops.
 The estimates for fatalities, injuries, property and crop damage was used
 to determine the most harmful impact to both public health and the economy.
 
-The results in this report found that excessive heat and tornado were most
-harmful with respect to public health, while flood, drought, and
-hurricane/typhoon had the greatest economic impact.
+The results in this report found that tornadoes were most
+harmful with respect to public health, while floods had the greatest economic
+impact.
 
-## Set up environment
+## Set Up Environment
 
 Disable warnings
 
@@ -85,7 +89,7 @@ if (!file.exists('data')) {
 if (!file.exists(stormDataFile)) {
     download.file(url = stormDataFileURL, destfile = stormDataFile)
 }
-stormData <- read.csv(stormDataFile, sep = ",")
+stormData <- read.csv(stormDataFile, sep = ",", header = TRUE)
 stopifnot(file.size(stormDataFile) == 49177144) 
 stopifnot(dim(stormData) == c(902297,37))
 ```
@@ -101,16 +105,262 @@ str(stormData)
 ```
 
 ```{r, echo = TRUE}
-summary(stormData)
-```
-
-```{r, echo = TRUE}
 head(stormData)
 ```
 
 ## Data Processing
 
-#stormData$BGN_DATE <- as.Date(stormData$BGN_DATE, format = "%m/%d/%Y")
+### Create Subset of Data
+
+When processing a large dataset, compute performance can be improved by taking a
+subset of the variables associated to public health and economy damage. For
+this analysis, the dataset will be trimmed to only include the necessary
+variables (listed below). In addition, only observations with `value > 0` will
+be included.
+
+| Variable     | Description                                                |
+|--------------|------------------------------------------------------------|
+| EVTYPE       | Event type (Flood, Heat, Hurricane, Tornado, ...)          |
+| FATALITIES   | Number of fatalities resulting from event                  |
+| INJURIES     | Number of injuries resulting from event                    |
+| PROPDMG      | Property damage in USD                                     |
+| PROPDMGEXP   | Unit multiplier for property damage (-, +, H, K, M, or B)  |
+| CROPDMG      | Crop damage in USD                                         |
+| CROPDMGEXP   | Unit multiplier for property damage (-, +, H, K, M, or B)  |
+| BGN_DATE     | Begin date of the event                                    |
+| END_DATE     | End date of the event                                      |
+| STATE        | State where the event occurred                             |
+
+```{r, echo = TRUE}
+stormDataTidy <- subset(stormData, EVTYPE != "?"
+                                   &
+                                   (FATALITIES > 0 | INJURIES > 0 | PROPDMG > 0 | CROPDMG > 0),
+                                   select = c("EVTYPE",
+                                              "FATALITIES",
+                                              "INJURIES", 
+                                              "PROPDMG",
+                                              "PROPDMGEXP",
+                                              "CROPDMG",
+                                              "CROPDMGEXP",
+                                              "BGN_DATE",
+                                              "END_DATE",
+                                              "STATE"))
+dim(stormDataTidy)
+sum(is.na(stormDataTidy))
+```
+
+The working (tidy) dataset contains 254632 observations, 10 variables and no
+missing values.
+
+### Clean Event Type Data
+
+There are a total of 487 unique Event Type values in the current tidy dataset.
+
+```{r, echo = TRUE}
+length(unique(stormDataTidy$EVTYPE))
+```
+
+Exploring the Event Type data revealed many values that appeared to be similar;
+however, they were entered with different spellings, pluralization, mixed
+case and even misspellings. For example, `Strong Wind`, `STRONG WIND`,
+`Strong Winds`, and `STRONG WINDS`.
+
+The dataset was normalized by converting all Event Type values to uppercase and
+combining similar Event Type values into unique categories.
+
+```{r, echo = TRUE}
+stormDataTidy$EVTYPE <- toupper(stormDataTidy$EVTYPE)
+```
+
+```{r, echo = TRUE}
+# AVALANCHE
+stormDataTidy$EVTYPE <- gsub('.*AVALANCE.*', 'AVALANCHE', stormDataTidy$EVTYPE)
+
+# BLIZZARD
+stormDataTidy$EVTYPE <- gsub('.*BLIZZARD.*', 'BLIZZARD', stormDataTidy$EVTYPE)
+
+# CLOUD
+stormDataTidy$EVTYPE <- gsub('.*CLOUD.*', 'CLOUD', stormDataTidy$EVTYPE)
+
+# COLD
+stormDataTidy$EVTYPE <- gsub('.*COLD.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*FREEZ.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*FROST.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*ICE.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*LOW TEMPERATURE RECORD.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*LO.*TEMP.*', 'COLD', stormDataTidy$EVTYPE)
+
+# DRY
+stormDataTidy$EVTYPE <- gsub('.*DRY.*', 'DRY', stormDataTidy$EVTYPE)
+
+# DUST
+stormDataTidy$EVTYPE <- gsub('.*DUST.*', 'DUST', stormDataTidy$EVTYPE)
+
+# FIRE
+stormDataTidy$EVTYPE <- gsub('.*FIRE.*', 'FIRE', stormDataTidy$EVTYPE)
+
+# FLOOD
+stormDataTidy$EVTYPE <- gsub('.*FLOOD.*', 'FLOOD', stormDataTidy$EVTYPE)
+
+# FOG
+stormDataTidy$EVTYPE <- gsub('.*FOG.*', 'FOG', stormDataTidy$EVTYPE)
+
+# HAIL
+stormDataTidy$EVTYPE <- gsub('.*HAIL.*', 'HAIL', stormDataTidy$EVTYPE)
+
+# HEAT
+stormDataTidy$EVTYPE <- gsub('.*HEAT.*', 'HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*WARM.*', 'HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*HIGH.*TEMP.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*RECORD HIGH TEMPERATURES.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
+
+# HYPOTHERMIA/EXPOSURE
+stormDataTidy$EVTYPE <- gsub('.*HYPOTHERMIA.*', 'HYPOTHERMIA/EXPOSURE', stormDataTidy$EVTYPE)
+
+# LANDSLIDE
+stormDataTidy$EVTYPE <- gsub('.*LANDSLIDE.*', 'LANDSLIDE', stormDataTidy$EVTYPE)
+
+# LIGHTNING
+stormDataTidy$EVTYPE <- gsub('^LIGHTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('^LIGNTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('^LIGHTING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
+
+# MICROBURST
+stormDataTidy$EVTYPE <- gsub('.*MICROBURST.*', 'MICROBURST', stormDataTidy$EVTYPE)
+
+# MUDSLIDE
+stormDataTidy$EVTYPE <- gsub('^MUDSLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('^MUD SLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
+
+# RAIN
+stormDataTidy$EVTYPE <- gsub('.*RAIN.*', 'RAIN', stormDataTidy$EVTYPE)
+
+# RIP CURRENT
+stormDataTidy$EVTYPE <- gsub('.*RIP CURRENT.*', 'RIP CURRENT', stormDataTidy$EVTYPE)
+
+# STORM
+stormDataTidy$EVTYPE <- gsub('.*STORM.*', 'STORM', stormDataTidy$EVTYPE)
+
+# SUMMARY
+stormDataTidy$EVTYPE <- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
+
+# TORNADO
+stormDataTidy$EVTYPE <- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*LANDSPOUT.*', 'TORNADO', stormDataTidy$EVTYPE)
+
+# SURF
+stormDataTidy$EVTYPE <- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
+
+# VOLCANIC
+stormDataTidy$EVTYPE <- gsub('.*VOLCANIC.*', 'VOLCANIC', stormDataTidy$EVTYPE)
+
+# WATERSPOUT
+stormDataTidy$EVTYPE <- gsub('.*WATERSPOUT.*', 'WATERSPOUT', stormDataTidy$EVTYPE)
+
+# WET
+stormDataTidy$EVTYPE <- gsub('.*WET.*', 'WET', stormDataTidy$EVTYPE)
+
+# WIND
+stormDataTidy$EVTYPE <- gsub('.*WIND.*', 'WIND', stormDataTidy$EVTYPE)
+
+# WINTER
+stormDataTidy$EVTYPE <- gsub('.*WINTER.*', 'WINTER', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*WINTRY.*', 'WINTER', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)
+```
+
+After tidying the dataset, the number of unique Event Type values were reduced
+to 83.
+
+```{r, echo = TRUE}
+length(unique(stormDataTidy$EVTYPE))
+```
+
+### Clean Date Data
+
+Format date variables for any type of optional reporting or further analysis.
+
+In the raw dataset, the `BNG_START` and `END_DATE` variables are stored as
+factors which should be made available as actual *date* types that can be
+manipulated and reported on. For now, time variables will be ignored.
+
+Create four new variables based on date variables in the tidy dataset:
+
+| Variable     | Description                                   |
+|--------------|-----------------------------------------------|
+| DATE_START   | Begin date of the event stored as a date type |
+| DATE_END     | End date of the event stored as a date type   |
+| YEAR         | Year the event started                        |
+| DURATION     | Duration (in hours) of the event              |
+
+```{r, echo = TRUE}
+stormDataTidy$DATE_START <- as.Date(stormDataTidy$BGN_DATE, format = "%m/%d/%Y")
+stormDataTidy$DATE_END <- as.Date(stormDataTidy$END_DATE, format = "%m/%d/%Y")
+stormDataTidy$YEAR <- as.integer(format(stormDataTidy$DATE_START, "%Y"))
+stormDataTidy$DURATION <- as.numeric(stormDataTidy$DATE_END - stormDataTidy$DATE_START)/3600
+```
+
+### Clean Economic Data
+
+According to the
+"National Weather Service [Storm Data Documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf)"
+(page 12), information about Property Damage is logged using two variables:
+`PROPDMG` and `PROPDMGEXP`. `PROPDMG` is the mantissa (significand) rounded to
+three significant digits and `PROPDMGEXP` is the exponent (the multiplier). The
+same approach is used for Crop Damage where the `CROPDMG` variable is encoded by
+the `CROPDMGEXP` variable.
+
+The documentation also specifies that the `PROPDMGEXP` and `CROPDMGEXP` are
+supposed to contain an alphabetical character used to signify magnitude and
+includes "K" for thousands, "M" for millions, and "B" for billions. A quick
+review of the data, however, shows that there are several other characters
+being logged.
+
+```{R, echo = TRUE}
+table(toupper(stormDataTidy$PROPDMGEXP))
+table(toupper(stormDataTidy$CROPDMGEXP))
+```
+
+In order to calculate costs, the `PROPDMGEXP` and `CROPDMGEXP` variables
+will be mapped to a multiplier factor which will then be used to calculate the
+actual costs of both property and crop damage. Three new variables will be
+created to store damage costs:
+
+* PROP_COST
+* CROP_COST
+* TOTAL_COST
+
+```{R, echo = TRUE}
+# function to get multiplier factor
+getMultiplier <- function(exp) {
+    exp <- toupper(exp);
+    if (exp == "")  return (10^0);
+    if (exp == "-") return (10^0);
+    if (exp == "?") return (10^0);
+    if (exp == "+") return (10^0);
+    if (exp == "0") return (10^0);
+    if (exp == "1") return (10^1);
+    if (exp == "2") return (10^2);
+    if (exp == "3") return (10^3);
+    if (exp == "4") return (10^4);
+    if (exp == "5") return (10^5);
+    if (exp == "6") return (10^6);
+    if (exp == "7") return (10^7);
+    if (exp == "8") return (10^8);
+    if (exp == "9") return (10^9);
+    if (exp == "H") return (10^2);
+    if (exp == "K") return (10^3);
+    if (exp == "M") return (10^6);
+    if (exp == "B") return (10^9);
+    return (NA);
+}
+
+# calculate property damage and crop damage costs
+stormDataTidy$PROP_COST <- with(stormDataTidy, as.numeric(PROPDMG) * sapply(PROPDMGEXP, getMultiplier))
+stormDataTidy$CROP_COST <- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROPDMGEXP, getMultiplier))
+stormDataTidy$TOTAL_COST <- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST
+```
 
 ### Impact on Public Health
 
