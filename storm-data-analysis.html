@@ -311,103 +311,6 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 ##  $ LONGITUDE_: num  8806 0 0 0 0 ...
 ##  $ REMARKS   : Factor w/ 436781 levels &quot;&quot;,&quot;\t&quot;,&quot;\t\t&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ REFNUM    : num  1 2 3 4 5 6 7 8 9 10 ...</code></pre>
-<pre class="r"><code>summary(stormData)</code></pre>
-<pre><code>##     STATE__                  BGN_DATE             BGN_TIME     
-##  Min.   : 1.0   5/25/2011 0:00:00:  1202   12:00:00 AM: 10163  
-##  1st Qu.:19.0   4/27/2011 0:00:00:  1193   06:00:00 PM:  7350  
-##  Median :30.0   6/9/2011 0:00:00 :  1030   04:00:00 PM:  7261  
-##  Mean   :31.2   5/30/2004 0:00:00:  1016   05:00:00 PM:  6891  
-##  3rd Qu.:45.0   4/4/2011 0:00:00 :  1009   12:00:00 PM:  6703  
-##  Max.   :95.0   4/2/2006 0:00:00 :   981   03:00:00 PM:  6700  
-##                 (Other)          :895866   (Other)    :857229  
-##    TIME_ZONE          COUNTY           COUNTYNAME         STATE       
-##  CST    :547493   Min.   :  0.0   JEFFERSON :  7840   TX     : 83728  
-##  EST    :245558   1st Qu.: 31.0   WASHINGTON:  7603   KS     : 53440  
-##  MST    : 68390   Median : 75.0   JACKSON   :  6660   OK     : 46802  
-##  PST    : 28302   Mean   :100.6   FRANKLIN  :  6256   MO     : 35648  
-##  AST    :  6360   3rd Qu.:131.0   LINCOLN   :  5937   IA     : 31069  
-##  HST    :  2563   Max.   :873.0   MADISON   :  5632   NE     : 30271  
-##  (Other):  3631                   (Other)   :862369   (Other):621339  
-##                EVTYPE         BGN_RANGE           BGN_AZI      
-##  HAIL             :288661   Min.   :   0.000          :547332  
-##  TSTM WIND        :219940   1st Qu.:   0.000   N      : 86752  
-##  THUNDERSTORM WIND: 82563   Median :   0.000   W      : 38446  
-##  TORNADO          : 60652   Mean   :   1.484   S      : 37558  
-##  FLASH FLOOD      : 54277   3rd Qu.:   1.000   E      : 33178  
-##  FLOOD            : 25326   Max.   :3749.000   NW     : 24041  
-##  (Other)          :170878                      (Other):134990  
-##          BGN_LOCATI                  END_DATE             END_TIME     
-##               :287743                    :243411              :238978  
-##  COUNTYWIDE   : 19680   4/27/2011 0:00:00:  1214   06:00:00 PM:  9802  
-##  Countywide   :   993   5/25/2011 0:00:00:  1196   05:00:00 PM:  8314  
-##  SPRINGFIELD  :   843   6/9/2011 0:00:00 :  1021   04:00:00 PM:  8104  
-##  SOUTH PORTION:   810   4/4/2011 0:00:00 :  1007   12:00:00 PM:  7483  
-##  NORTH PORTION:   784   5/30/2004 0:00:00:   998   11:59:00 PM:  7184  
-##  (Other)      :591444   (Other)          :653450   (Other)    :622432  
-##    COUNTY_END COUNTYENDN       END_RANGE           END_AZI      
-##  Min.   :0    Mode:logical   Min.   :  0.0000          :724837  
-##  1st Qu.:0    NA's:902297    1st Qu.:  0.0000   N      : 28082  
-##  Median :0                   Median :  0.0000   S      : 22510  
-##  Mean   :0                   Mean   :  0.9862   W      : 20119  
-##  3rd Qu.:0                   3rd Qu.:  0.0000   E      : 20047  
-##  Max.   :0                   Max.   :925.0000   NE     : 14606  
-##                                                 (Other): 72096  
-##            END_LOCATI         LENGTH              WIDTH         
-##                 :499225   Min.   :   0.0000   Min.   :   0.000  
-##  COUNTYWIDE     : 19731   1st Qu.:   0.0000   1st Qu.:   0.000  
-##  SOUTH PORTION  :   833   Median :   0.0000   Median :   0.000  
-##  NORTH PORTION  :   780   Mean   :   0.2301   Mean   :   7.503  
-##  CENTRAL PORTION:   617   3rd Qu.:   0.0000   3rd Qu.:   0.000  
-##  SPRINGFIELD    :   575   Max.   :2315.0000   Max.   :4400.000  
-##  (Other)        :380536                                         
-##        F               MAG            FATALITIES          INJURIES        
-##  Min.   :0.0      Min.   :    0.0   Min.   :  0.0000   Min.   :   0.0000  
-##  1st Qu.:0.0      1st Qu.:    0.0   1st Qu.:  0.0000   1st Qu.:   0.0000  
-##  Median :1.0      Median :   50.0   Median :  0.0000   Median :   0.0000  
-##  Mean   :0.9      Mean   :   46.9   Mean   :  0.0168   Mean   :   0.1557  
-##  3rd Qu.:1.0      3rd Qu.:   75.0   3rd Qu.:  0.0000   3rd Qu.:   0.0000  
-##  Max.   :5.0      Max.   :22000.0   Max.   :583.0000   Max.   :1700.0000  
-##  NA's   :843563                                                           
-##     PROPDMG          PROPDMGEXP        CROPDMG          CROPDMGEXP    
-##  Min.   :   0.00          :465934   Min.   :  0.000          :618413  
-##  1st Qu.:   0.00   K      :424665   1st Qu.:  0.000   K      :281832  
-##  Median :   0.00   M      : 11330   Median :  0.000   M      :  1994  
-##  Mean   :  12.06   0      :   216   Mean   :  1.527   k      :    21  
-##  3rd Qu.:   0.50   B      :    40   3rd Qu.:  0.000   0      :    19  
-##  Max.   :5000.00   5      :    28   Max.   :990.000   B      :     9  
-##                    (Other):    84                     (Other):     9  
-##       WFO                                       STATEOFFIC    
-##         :142069                                      :248769  
-##  OUN    : 17393   TEXAS, North                       : 12193  
-##  JAN    : 13889   ARKANSAS, Central and North Central: 11738  
-##  LWX    : 13174   IOWA, Central                      : 11345  
-##  PHI    : 12551   KANSAS, Southwest                  : 11212  
-##  TSA    : 12483   GEORGIA, North and Central         : 11120  
-##  (Other):690738   (Other)                            :595920  
-##                                                                                                                                                                                                     ZONENAMES     
-##                                                                                                                                                                                                          :594029  
-##                                                                                                                                                                                                          :205988  
-##  GREATER RENO / CARSON CITY / M - GREATER RENO / CARSON CITY / M                                                                                                                                         :   639  
-##  GREATER LAKE TAHOE AREA - GREATER LAKE TAHOE AREA                                                                                                                                                       :   592  
-##  JEFFERSON - JEFFERSON                                                                                                                                                                                   :   303  
-##  MADISON - MADISON                                                                                                                                                                                       :   302  
-##  (Other)                                                                                                                                                                                                 :100444  
-##     LATITUDE      LONGITUDE        LATITUDE_E     LONGITUDE_    
-##  Min.   :   0   Min.   :-14451   Min.   :   0   Min.   :-14455  
-##  1st Qu.:2802   1st Qu.:  7247   1st Qu.:   0   1st Qu.:     0  
-##  Median :3540   Median :  8707   Median :   0   Median :     0  
-##  Mean   :2875   Mean   :  6940   Mean   :1452   Mean   :  3509  
-##  3rd Qu.:4019   3rd Qu.:  9605   3rd Qu.:3549   3rd Qu.:  8735  
-##  Max.   :9706   Max.   : 17124   Max.   :9706   Max.   :106220  
-##  NA's   :47                      NA's   :40                     
-##                                            REMARKS           REFNUM      
-##                                                :287433   Min.   :     1  
-##                                                : 24013   1st Qu.:225575  
-##  Trees down.\n                                 :  1110   Median :451149  
-##  Several trees were blown down.\n              :   568   Mean   :451149  
-##  Trees were downed.\n                          :   446   3rd Qu.:676723  
-##  Large trees and power lines were blown down.\n:   432   Max.   :902297  
-##  (Other)                                       :588295</code></pre>
 <pre class="r"><code>head(stormData)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -419,7 +322,7 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 <h2>Data Processing</h2>
 <div id="create-subset-of-data" class="section level3">
 <h3>Create Subset of Data</h3>
-<p>When processing a large dataset, compute performance can be improved by taking a subset of the variables associated to the population and economy damage. For this analysis, the dataset will be trimmed to only include the necessary variables (listed below). In addition, only observations with <code>value &gt; 0</code> will be included.</p>
+<p>When processing a large dataset, compute performance can be improved by taking a subset of the variables associated to public health and economy damage. For this analysis, the dataset will be trimmed to only include the necessary variables (listed below). In addition, only observations with <code>value &gt; 0</code> will be included.</p>
 <table>
 <thead>
 <tr class="header">
@@ -497,74 +400,100 @@ dim(stormDataTidy)</code></pre>
 <p>Exploring the Event Type data revealed many values that appeared to be similar; however, they were entered with different spellings, pluralization, mixed case and even misspellings. For example, <code>Strong Wind</code>, <code>STRONG WIND</code>, <code>Strong Winds</code>, and <code>STRONG WINDS</code>.</p>
 <p>The dataset was normalized by converting all Event Type values to uppercase and combining similar Event Type values into unique categories.</p>
 <pre class="r"><code>stormDataTidy$EVTYPE &lt;- toupper(stormDataTidy$EVTYPE)</code></pre>
-<pre class="r"><code># avalanche
+<pre class="r"><code># AVALANCHE
 stormDataTidy$EVTYPE &lt;- gsub('.*AVALANCE.*', 'AVALANCHE', stormDataTidy$EVTYPE)
-# blizzard
+
+# BLIZZARD
 stormDataTidy$EVTYPE &lt;- gsub('.*BLIZZARD.*', 'BLIZZARD', stormDataTidy$EVTYPE)
-# cloud
+
+# CLOUD
 stormDataTidy$EVTYPE &lt;- gsub('.*CLOUD.*', 'CLOUD', stormDataTidy$EVTYPE)
-# cold
+
+# COLD
 stormDataTidy$EVTYPE &lt;- gsub('.*COLD.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*FREEZ.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*FROST.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*ICE.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*LOW TEMPERATURE RECORD.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*LO.*TEMP.*', 'COLD', stormDataTidy$EVTYPE)
-# dry
+
+# DRY
 stormDataTidy$EVTYPE &lt;- gsub('.*DRY.*', 'DRY', stormDataTidy$EVTYPE)
-# dust
+
+# DUST
 stormDataTidy$EVTYPE &lt;- gsub('.*DUST.*', 'DUST', stormDataTidy$EVTYPE)
-# fire
+
+# FIRE
 stormDataTidy$EVTYPE &lt;- gsub('.*FIRE.*', 'FIRE', stormDataTidy$EVTYPE)
-# flood
+
+# FLOOD
 stormDataTidy$EVTYPE &lt;- gsub('.*FLOOD.*', 'FLOOD', stormDataTidy$EVTYPE)
-# fog
+
+# FOG
 stormDataTidy$EVTYPE &lt;- gsub('.*FOG.*', 'FOG', stormDataTidy$EVTYPE)
-# hail
+
+# HAIL
 stormDataTidy$EVTYPE &lt;- gsub('.*HAIL.*', 'HAIL', stormDataTidy$EVTYPE)
-# heat / extreme heat
+
+# HEAT
 stormDataTidy$EVTYPE &lt;- gsub('.*HEAT.*', 'HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*WARM.*', 'HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*HIGH.*TEMP.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*RECORD HIGH TEMPERATURES.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
-# hypothermia/exposure
+
+# HYPOTHERMIA/EXPOSURE
 stormDataTidy$EVTYPE &lt;- gsub('.*HYPOTHERMIA.*', 'HYPOTHERMIA/EXPOSURE', stormDataTidy$EVTYPE)
-# landslide
+
+# LANDSLIDE
 stormDataTidy$EVTYPE &lt;- gsub('.*LANDSLIDE.*', 'LANDSLIDE', stormDataTidy$EVTYPE)
-# lightning
+
+# LIGHTNING
 stormDataTidy$EVTYPE &lt;- gsub('^LIGHTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('^LIGNTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('^LIGHTING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
-# microburst
+
+# MICROBURST
 stormDataTidy$EVTYPE &lt;- gsub('.*MICROBURST.*', 'MICROBURST', stormDataTidy$EVTYPE)
-# mudslide
+
+# MUDSLIDE
 stormDataTidy$EVTYPE &lt;- gsub('^MUDSLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('^MUD SLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
-# rain
+
+# RAIN
 stormDataTidy$EVTYPE &lt;- gsub('.*RAIN.*', 'RAIN', stormDataTidy$EVTYPE)
-# rip current
+
+# RIP CURRENT
 stormDataTidy$EVTYPE &lt;- gsub('.*RIP CURRENT.*', 'RIP CURRENT', stormDataTidy$EVTYPE)
-# storm
+
+# STORM
 stormDataTidy$EVTYPE &lt;- gsub('.*STORM.*', 'STORM', stormDataTidy$EVTYPE)
-# summary
+
+# SUMMARY
 stormDataTidy$EVTYPE &lt;- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
-# tornado
+
+# TORNADO
 stormDataTidy$EVTYPE &lt;- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
-# surf
+
+# SURF
 stormDataTidy$EVTYPE &lt;- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
-# volcanic
+
+# VOLCANIC
 stormDataTidy$EVTYPE &lt;- gsub('.*VOLCANIC.*', 'VOLCANIC', stormDataTidy$EVTYPE)
-# waterspout
+
+# WATERSPOUT
 stormDataTidy$EVTYPE &lt;- gsub('.*WATERSPOUT.*', 'WATERSPOUT', stormDataTidy$EVTYPE)
-# wet
+
+# WET
 stormDataTidy$EVTYPE &lt;- gsub('.*WET.*', 'WET', stormDataTidy$EVTYPE)
-# wind
+
+# WIND
 stormDataTidy$EVTYPE &lt;- gsub('.*WIND.*', 'WIND', stormDataTidy$EVTYPE)
-# winter
+
+# WINTER
 stormDataTidy$EVTYPE &lt;- gsub('.*WINTER.*', 'WINTER', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE &lt;- gsub('.*WINTRY.*', 'WINTER', stormDataTidy$EVTYPE)
-stormDataTidy$EVTYPE &lt;- gsub('.*SNOW.*', 'COLD', stormDataTidy$EVTYPE)</code></pre>
+stormDataTidy$EVTYPE &lt;- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)</code></pre>
 <p>After tidying the dataset, the number of unique Event Type values were reduced to 83.</p>
 <pre class="r"><code>length(unique(stormDataTidy$EVTYPE))</code></pre>
 <pre><code>## [1] 83</code></pre>

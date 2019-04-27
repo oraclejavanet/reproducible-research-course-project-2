@@ -105,10 +105,6 @@ str(stormData)
 ```
 
 ```{r, echo = TRUE}
-summary(stormData)
-```
-
-```{r, echo = TRUE}
 head(stormData)
 ```
 
@@ -117,7 +113,7 @@ head(stormData)
 ### Create Subset of Data
 
 When processing a large dataset, compute performance can be improved by taking a
-subset of the variables associated to the population and economy damage. For
+subset of the variables associated to public health and economy damage. For
 this analysis, the dataset will be trimmed to only include the necessary
 variables (listed below). In addition, only observations with `value > 0` will
 be included.
@@ -177,74 +173,100 @@ stormDataTidy$EVTYPE <- toupper(stormDataTidy$EVTYPE)
 ```
 
 ```{r, echo = TRUE}
-# avalanche
+# AVALANCHE
 stormDataTidy$EVTYPE <- gsub('.*AVALANCE.*', 'AVALANCHE', stormDataTidy$EVTYPE)
-# blizzard
+
+# BLIZZARD
 stormDataTidy$EVTYPE <- gsub('.*BLIZZARD.*', 'BLIZZARD', stormDataTidy$EVTYPE)
-# cloud
+
+# CLOUD
 stormDataTidy$EVTYPE <- gsub('.*CLOUD.*', 'CLOUD', stormDataTidy$EVTYPE)
-# cold
+
+# COLD
 stormDataTidy$EVTYPE <- gsub('.*COLD.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*FREEZ.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*FROST.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*ICE.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*LOW TEMPERATURE RECORD.*', 'COLD', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*LO.*TEMP.*', 'COLD', stormDataTidy$EVTYPE)
-# dry
+
+# DRY
 stormDataTidy$EVTYPE <- gsub('.*DRY.*', 'DRY', stormDataTidy$EVTYPE)
-# dust
+
+# DUST
 stormDataTidy$EVTYPE <- gsub('.*DUST.*', 'DUST', stormDataTidy$EVTYPE)
-# fire
+
+# FIRE
 stormDataTidy$EVTYPE <- gsub('.*FIRE.*', 'FIRE', stormDataTidy$EVTYPE)
-# flood
+
+# FLOOD
 stormDataTidy$EVTYPE <- gsub('.*FLOOD.*', 'FLOOD', stormDataTidy$EVTYPE)
-# fog
+
+# FOG
 stormDataTidy$EVTYPE <- gsub('.*FOG.*', 'FOG', stormDataTidy$EVTYPE)
-# hail
+
+# HAIL
 stormDataTidy$EVTYPE <- gsub('.*HAIL.*', 'HAIL', stormDataTidy$EVTYPE)
-# heat / extreme heat
+
+# HEAT
 stormDataTidy$EVTYPE <- gsub('.*HEAT.*', 'HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*WARM.*', 'HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*HIGH.*TEMP.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*RECORD HIGH TEMPERATURES.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
-# hypothermia/exposure
+
+# HYPOTHERMIA/EXPOSURE
 stormDataTidy$EVTYPE <- gsub('.*HYPOTHERMIA.*', 'HYPOTHERMIA/EXPOSURE', stormDataTidy$EVTYPE)
-# landslide
+
+# LANDSLIDE
 stormDataTidy$EVTYPE <- gsub('.*LANDSLIDE.*', 'LANDSLIDE', stormDataTidy$EVTYPE)
-# lightning
+
+# LIGHTNING
 stormDataTidy$EVTYPE <- gsub('^LIGHTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('^LIGNTNING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('^LIGHTING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
-# microburst
+
+# MICROBURST
 stormDataTidy$EVTYPE <- gsub('.*MICROBURST.*', 'MICROBURST', stormDataTidy$EVTYPE)
-# mudslide
+
+# MUDSLIDE
 stormDataTidy$EVTYPE <- gsub('^MUDSLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('^MUD SLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
-# rain
+
+# RAIN
 stormDataTidy$EVTYPE <- gsub('.*RAIN.*', 'RAIN', stormDataTidy$EVTYPE)
-# rip current
+
+# RIP CURRENT
 stormDataTidy$EVTYPE <- gsub('.*RIP CURRENT.*', 'RIP CURRENT', stormDataTidy$EVTYPE)
-# storm
+
+# STORM
 stormDataTidy$EVTYPE <- gsub('.*STORM.*', 'STORM', stormDataTidy$EVTYPE)
-# summary
+
+# SUMMARY
 stormDataTidy$EVTYPE <- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
-# tornado
+
+# TORNADO
 stormDataTidy$EVTYPE <- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
-# surf
+
+# SURF
 stormDataTidy$EVTYPE <- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
-# volcanic
+
+# VOLCANIC
 stormDataTidy$EVTYPE <- gsub('.*VOLCANIC.*', 'VOLCANIC', stormDataTidy$EVTYPE)
-# waterspout
+
+# WATERSPOUT
 stormDataTidy$EVTYPE <- gsub('.*WATERSPOUT.*', 'WATERSPOUT', stormDataTidy$EVTYPE)
-# wet
+
+# WET
 stormDataTidy$EVTYPE <- gsub('.*WET.*', 'WET', stormDataTidy$EVTYPE)
-# wind
+
+# WIND
 stormDataTidy$EVTYPE <- gsub('.*WIND.*', 'WIND', stormDataTidy$EVTYPE)
-# winter
+
+# WINTER
 stormDataTidy$EVTYPE <- gsub('.*WINTER.*', 'WINTER', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*WINTRY.*', 'WINTER', stormDataTidy$EVTYPE)
-stormDataTidy$EVTYPE <- gsub('.*SNOW.*', 'COLD', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)
 ```
 
 After tidying the dataset, the number of unique Event Type values were reduced
