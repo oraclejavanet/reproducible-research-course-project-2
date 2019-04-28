@@ -59,6 +59,7 @@ Load libraries
 library(dplyr, warn.conflicts = FALSE)
 library(xtable)
 library(ggplot2)
+library(scales)
 options(scipen = 1) # disable scientific notation for numbers
 ```
 
@@ -225,8 +226,8 @@ stormDataTidy$EVTYPE <- gsub('^LIGHTING.*', 'LIGHTNING', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*MICROBURST.*', 'MICROBURST', stormDataTidy$EVTYPE)
 
 # MUDSLIDE
-stormDataTidy$EVTYPE <- gsub('^MUDSLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
-stormDataTidy$EVTYPE <- gsub('^MUD SLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*MUDSLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*MUD SLIDE.*', 'MUDSLIDE', stormDataTidy$EVTYPE)
 
 # RAIN
 stormDataTidy$EVTYPE <- gsub('.*RAIN.*', 'RAIN', stormDataTidy$EVTYPE)
@@ -244,15 +245,13 @@ stormDataTidy$EVTYPE <- gsub('.*SUMMARY.*', 'SUMMARY', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*TORNADO.*', 'TORNADO', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*TORNDAO.*', 'TORNADO', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*LANDSPOUT.*', 'TORNADO', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*WATERSPOUT.*', 'TORNADO', stormDataTidy$EVTYPE)
 
 # SURF
 stormDataTidy$EVTYPE <- gsub('.*SURF.*', 'SURF', stormDataTidy$EVTYPE)
 
 # VOLCANIC
 stormDataTidy$EVTYPE <- gsub('.*VOLCANIC.*', 'VOLCANIC', stormDataTidy$EVTYPE)
-
-# WATERSPOUT
-stormDataTidy$EVTYPE <- gsub('.*WATERSPOUT.*', 'WATERSPOUT', stormDataTidy$EVTYPE)
 
 # WET
 stormDataTidy$EVTYPE <- gsub('.*WET.*', 'WET', stormDataTidy$EVTYPE)
@@ -267,7 +266,7 @@ stormDataTidy$EVTYPE <- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)
 ```
 
 After tidying the dataset, the number of unique Event Type values were reduced
-to 82.
+to 81
 
 ```{r, echo = TRUE}
 length(unique(stormDataTidy$EVTYPE))
@@ -320,12 +319,11 @@ table(toupper(stormDataTidy$CROPDMGEXP))
 
 In order to calculate costs, the `PROPDMGEXP` and `CROPDMGEXP` variables
 will be mapped to a multiplier factor which will then be used to calculate the
-actual costs of both property and crop damage. Three new variables will be
+actual costs of both property and crop damage. Two new variables will be
 created to store damage costs:
 
 * PROP_COST
 * CROP_COST
-* TOTAL_COST
 
 ```{r, echo = TRUE}
 # function to get multiplier factor
@@ -352,27 +350,33 @@ getMultiplier <- function(exp) {
     return (NA);
 }
 
-# calculate property damage and crop damage costs
-stormDataTidy$PROP_COST <- with(stormDataTidy, as.numeric(PROPDMG) * sapply(PROPDMGEXP, getMultiplier))
-stormDataTidy$CROP_COST <- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROPDMGEXP, getMultiplier))
-stormDataTidy$TOTAL_COST <- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST
+# calculate property damage and crop damage costs (in billions)
+stormDataTidy$PROP_COST <- with(stormDataTidy, as.numeric(PROPDMG) * sapply(PROPDMGEXP, getMultiplier))/10^9
+stormDataTidy$CROP_COST <- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROPDMGEXP, getMultiplier))/10^9
 ```
 
 ### Summarize Data
 
-A summarized dataset that includes population health data (fatalities + injuries).
+Create a summarized dataset of health impact data (fatalities + injuries).
+Sort the results in descending order by health impact.
 
 ```{r, echo = TRUE}
-populationHealthData <- aggregate(x = list(HEALTH_IMPACT = stormDataTidy$FATALITIES + stormDataTidy$INJURIES), 
+healthImpactData <- aggregate(x = list(HEALTH_IMPACT = stormDataTidy$FATALITIES + stormDataTidy$INJURIES), 
                                   by = list(EVENT_TYPE = stormDataTidy$EVTYPE), 
                                   FUN = sum,
                                   na.rm = TRUE)
-populationHealthData <- populationHealthData[order(populationHealthData$HEALTH_IMPACT, decreasing = TRUE),]
+healthImpactData <- healthImpactData[order(healthImpactData$HEALTH_IMPACT, decreasing = TRUE),]
 ```
 
-A summarized dataset that includes economic data (property and crop damage).
+Create a summarized dataset of damage impact costs (property damage + crop damage).
+Sort the results in descending order by damage cost.
 
 ```{r, echo = TRUE}
+damageCostImpactData <- aggregate(x = list(DAMAGE_IMPACT = stormDataTidy$PROP_COST + stormDataTidy$CROP_COST), 
+                                  by = list(EVENT_TYPE = stormDataTidy$EVTYPE), 
+                                  FUN = sum,
+                                  na.rm = TRUE)
+damageCostImpactData <- damageCostImpactData[order(damageCostImpactData$DAMAGE_IMPACT, decreasing = TRUE),]
 ```
 
 ## Results
@@ -384,23 +388,24 @@ results below display the 10 most harmful weather events in terms of population
 health in the U.S.
 
 ```{r, echo = TRUE, message = FALSE, results = 'asis'}
-print(xtable(head(populationHealthData, 10),
-             caption = "Top 10 Weather Events Most Harmful to Population Health in U.S."),
+print(xtable(head(healthImpactData, 10),
+             caption = "Top 10 Weather Events Most Harmful to Population Health"),
              caption.placement = 'top',
              type = "html",
              include.rownames = FALSE,
              html.table.attributes='class="table-bordered", width="100%"')
 ```
-<br />
+<br /><br />
 
 ```{r health-impact-chart, echo = TRUE, fig.path='figures/'}
-healthImpactChart <- ggplot(head(populationHealthData, 10),
+healthImpactChart <- ggplot(head(healthImpactData, 10),
                             aes(x = reorder(EVENT_TYPE, HEALTH_IMPACT), y = HEALTH_IMPACT, fill = EVENT_TYPE)) +
                             coord_flip() +
                             geom_bar(stat = "identity") + 
                             xlab("Event Type") +
-                            ylab("Total Fatalities and Injures") + 
-                            ggtitle("Top 10 Weather Events Most Harmful to Population Health in U.S.")
+                            ylab("Total Fatalities and Injures") +
+                            theme(plot.title = element_text(size = 14, hjust = 0.5)) +
+                            ggtitle("Top 10 Weather Events Most Harmful to\nPopulation Health")
 print(healthImpactChart)
 ```
 
@@ -410,7 +415,27 @@ Property and crop damage have the most harmful impact on the economy. The
 results below display the 10 most harmful weather events in terms economic
 consequences in the U.S.
 
-*Pending*
+```{r, echo = TRUE, message = FALSE, results = 'asis'}
+print(xtable(head(damageCostImpactData, 10),
+             caption = "Top 10 Weather Events with Greatest Economic Consequences"),
+             caption.placement = 'top',
+             type = "html",
+             include.rownames = FALSE,
+             html.table.attributes='class="table-bordered", width="100%"')
+```
+<br /><br />
+
+```{r economic-impact-chart, echo = TRUE, fig.path='figures/'}
+damageCostImpactChart <- ggplot(head(damageCostImpactData, 10),
+                            aes(x = reorder(EVENT_TYPE, DAMAGE_IMPACT), y = DAMAGE_IMPACT, fill = EVENT_TYPE)) +
+                            coord_flip() +
+                            geom_bar(stat = "identity") + 
+                            xlab("Event Type") +
+                            ylab("Total Property / Crop Damage Cost\n(in Billions)") +
+                            theme(plot.title = element_text(size = 14, hjust = 0.5)) +
+                            ggtitle("Top 10 Weather Events with\nGreatest Economic Consequences")
+print(damageCostImpactChart)
+```
 
 ## Conclusion
 
@@ -423,4 +448,4 @@ included data and graphs, the following conclusions can be drawn:
     
 * **Which types of weather events have the greatest economic consequences?**
     
-    Floods are responsible for causing the most property damage and crop damage.
+    Floods are responsible for causing the most property damage and crop damage costs.
