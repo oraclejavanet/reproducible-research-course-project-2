@@ -47,7 +47,7 @@ to determine the most harmful impact to both population health and the economy.
 
 ## Set Up Environment
 
-Disable warnings
+Setup options
 
 ```{r setup, include = TRUE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -56,9 +56,10 @@ knitr::opts_chunk$set(echo = FALSE)
 Load libraries
 
 ```{r, echo = TRUE}
-options(scipen = 1) # disable scientific notation for numbers
 library(dplyr, warn.conflicts = FALSE)
+library(xtable)
 library(ggplot2)
+options(scipen = 1) # disable scientific notation for numbers
 ```
 
 Session information
@@ -119,9 +120,9 @@ be included.
 | FATALITIES   | Number of fatalities resulting from event                  |
 | INJURIES     | Number of injuries resulting from event                    |
 | PROPDMG      | Property damage in USD                                     |
-| PROPDMGEXP   | Unit multiplier for property damage (-, +, H, K, M, or B)  |
+| PROPDMGEXP   | Unit multiplier for property damage (K, M, or B)           |
 | CROPDMG      | Crop damage in USD                                         |
-| CROPDMGEXP   | Unit multiplier for property damage (-, +, H, K, M, or B)  |
+| CROPDMGEXP   | Unit multiplier for property damage (K, M, or B)           |
 | BGN_DATE     | Begin date of the event                                    |
 | END_DATE     | End date of the event                                      |
 | STATE        | State where the event occurred                             |
@@ -266,7 +267,7 @@ stormDataTidy$EVTYPE <- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)
 ```
 
 After tidying the dataset, the number of unique Event Type values were reduced
-to 83.
+to 82.
 
 ```{r, echo = TRUE}
 length(unique(stormDataTidy$EVTYPE))
@@ -312,7 +313,7 @@ includes "K" for thousands, "M" for millions, and "B" for billions. A quick
 review of the data, however, shows that there are several other characters
 being logged.
 
-```{R, echo = TRUE}
+```{r, echo = TRUE}
 table(toupper(stormDataTidy$PROPDMGEXP))
 table(toupper(stormDataTidy$CROPDMGEXP))
 ```
@@ -326,7 +327,7 @@ created to store damage costs:
 * CROP_COST
 * TOTAL_COST
 
-```{R, echo = TRUE}
+```{r, echo = TRUE}
 # function to get multiplier factor
 getMultiplier <- function(exp) {
     exp <- toupper(exp);
@@ -359,33 +360,57 @@ stormDataTidy$TOTAL_COST <- stormDataTidy$PROP_COST + stormDataTidy$CROP_COST
 
 ### Summarize Data
 
-```{R, echo = TRUE}
-populationHealthData <- aggregate(x = list(healthImpact = stormDataTidy$FATALITIES + stormDataTidy$INJURIES), 
+A summarized dataset that includes population health data (fatalities + injuries).
+
+```{r, echo = TRUE}
+populationHealthData <- aggregate(x = list(HEALTH_IMPACT = stormDataTidy$FATALITIES + stormDataTidy$INJURIES), 
                                   by = list(EVENT_TYPE = stormDataTidy$EVTYPE), 
                                   FUN = sum,
                                   na.rm = TRUE)
-populationHealthData <- populationHealthData[order(populationHealthData$healthImpact, decreasing = TRUE),]
+populationHealthData <- populationHealthData[order(populationHealthData$HEALTH_IMPACT, decreasing = TRUE),]
+```
+
+A summarized dataset that includes economic data (property and crop damage).
+
+```{r, echo = TRUE}
 ```
 
 ## Results
 
 ### Event Types Most Harmful to Population Health
 
-```{R, echo = TRUE}
+Fatalities and injuries have the most harmful impact on population health. The
+results below display the 10 most harmful weather events in terms of population
+health in the U.S.
+
+```{r, echo = TRUE, message = FALSE, results = 'asis'}
+print(xtable(head(populationHealthData, 10),
+             caption = "Top 10 Weather Events Most Harmful to Population Health in U.S."),
+             caption.placement = 'top',
+             type = "html",
+             include.rownames = FALSE,
+             html.table.attributes='class="table-bordered", width="100%"')
+```
+<br />
+
+```{r health-impact-chart, echo = TRUE, fig.path='figures/'}
 healthImpactChart <- ggplot(head(populationHealthData, 10),
-                            geom_bar(stat = "identity") + 
-                            aes(x = reorder(EVENT_TYPE, healthImpact), y = healthImpact, fill = EVENT_TYPE)) +
+                            aes(x = reorder(EVENT_TYPE, HEALTH_IMPACT), y = HEALTH_IMPACT, fill = EVENT_TYPE)) +
                             coord_flip() +
+                            geom_bar(stat = "identity") + 
                             xlab("Event Type") +
                             ylab("Total Fatalities and Injures") + 
                             ggtitle("Top 10 Weather Events Most Harmful to Population Health in U.S.")
 print(healthImpactChart)
 ```
 
-
 ### Event Types with Greatest Economic Consequences
 
+Property and crop damage have the most harmful impact on the economy. The
+results below display the 10 most harmful weather events in terms economic
+consequences in the U.S.
 
+*Pending*
 
 ## Conclusion
 
@@ -393,30 +418,9 @@ Based on the evidence demonstrated in this analysis and supported by the
 included data and graphs, the following conclusions can be drawn:
 
 * **Which types of weather events are most harmful to population health?**
-
-Tornadoes are responsible for the greatest number of fatalities and injuries.
-
+    
+    Tornadoes are responsible for the greatest number of fatalities and injuries.
+    
 * **Which types of weather events have the greatest economic consequences?**
-
-Floods are the weather event that cause most Property Damage, followed by hurricanes.
-
-Drought are the weather event that causes most crop damages, followed by flood.
-
-
---------------
-From these data and graphs, we found that Tornado are most harmful with respect to population health, while Flood have the greatest economic consequences.
-
-
-The results in this report found that tornadoes were most
-harmful with respect to population health, while floods had the greatest economic
-impact.
-
-4.1 - Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
-
-Tornado was the most harmful weather event type in terms of population health.
-
-4.2 - Across the United States, which types of events have the greatest economic consequences?
-
-Flood was the worst weather event type in terms of economic consequences.
-
-The analysis shows Tornado was the most harmful weather event type in terms of population health while Flood was the weather event type had the worst economic impact.
+    
+    Floods are responsible for causing the most property damage and crop damage.
