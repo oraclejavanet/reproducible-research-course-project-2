@@ -1,7 +1,7 @@
 ---
 title: "Analysis of U.S. Storm Event Data and the Impact on Population Health and the Economy"
 author: "Jeffrey Hunter"
-date: "4/26/2019"
+date: "4/27/2019"
 output:
   html_document:
     df_print: paged
@@ -40,32 +40,34 @@ U.S. National Oceanic and Atmospheric Administration's (NOAA).
 
 The storm database includes weather events from 1950 through the year 2011 and
 contains data estimates such as the number fatalities and injuries for each
-weather event as well as economic damage on properties and crops.
+weather event as well as economic cost damage to properties and crops for each
+weather event.
 
-The estimates for fatalities, injuries, property and crop damage were used
-to determine the most harmful impact to both population health and the economy.
+The estimates for fatalities and injuries were used to determine weather events
+with the most harmful impact to population health. Property damage and crop
+damage cost estimates were used to determine weather events with the
+greatest economic consequences.
 
 ## Set Up Environment
 
-Setup options
+Set global options
 
-```{r setup, include = TRUE}
+```{r global-options, include = TRUE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 Load libraries
 
-```{r, echo = TRUE}
+```{r load-libraries, echo = TRUE}
 library(dplyr, warn.conflicts = FALSE)
 library(xtable)
 library(ggplot2)
-library(scales)
 options(scipen = 1) # disable scientific notation for numbers
 ```
 
 Session information
 
-```{r, echo = TRUE}
+```{r display-session-info, echo = TRUE}
 sessionInfo()
 ```
 
@@ -76,7 +78,7 @@ then load the compressed data file via `read.csv`. Prior to processing
 the data, validate the downloaded data file and loaded dataset by checking the file 
 size and dimensions respectively.
 
-```{r, echo = TRUE, cache = TRUE}
+```{r load-data, echo = TRUE, cache = TRUE}
 setwd("~jhunter/repos/coursera/reproducible-research-course-project-2")
 stormDataFileURL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 stormDataFile <- "data/storm-data.csv.bz2"
@@ -110,10 +112,9 @@ head(stormData)
 ### Create Subset of Data
 
 When processing a large dataset, compute performance can be improved by taking a
-subset of the variables associated to population health and economy damage. For
-this analysis, the dataset will be trimmed to only include the necessary
-variables (listed below). In addition, only observations with `value > 0` will
-be included.
+subset of the variables required for the analysis. For this analysis, the
+dataset will be trimmed to only include the necessary variables (listed below).
+In addition, only observations with `value > 0` will be included.
 
 | Variable     | Description                                                |
 |--------------|------------------------------------------------------------|
@@ -128,7 +129,7 @@ be included.
 | END_DATE     | End date of the event                                      |
 | STATE        | State where the event occurred                             |
 
-```{r, echo = TRUE}
+```{r create-subset-database, echo = TRUE}
 stormDataTidy <- subset(stormData, EVTYPE != "?"
                                    &
                                    (FATALITIES > 0 | INJURIES > 0 | PROPDMG > 0 | CROPDMG > 0),
@@ -153,7 +154,7 @@ missing values.
 
 There are a total of 487 unique Event Type values in the current tidy dataset.
 
-```{r, echo = TRUE}
+```{r display-unique-event-types, echo = TRUE}
 length(unique(stormDataTidy$EVTYPE))
 ```
 
@@ -165,11 +166,11 @@ case and even misspellings. For example, `Strong Wind`, `STRONG WIND`,
 The dataset was normalized by converting all Event Type values to uppercase and
 combining similar Event Type values into unique categories.
 
-```{r, echo = TRUE}
+```{r convert-event-type-toupper, echo = TRUE}
 stormDataTidy$EVTYPE <- toupper(stormDataTidy$EVTYPE)
 ```
 
-```{r, echo = TRUE}
+```{r clean-event-type-data, echo = TRUE}
 # AVALANCHE
 stormDataTidy$EVTYPE <- gsub('.*AVALANCE.*', 'AVALANCHE', stormDataTidy$EVTYPE)
 
@@ -268,7 +269,7 @@ stormDataTidy$EVTYPE <- gsub('.*SNOW.*', 'WINTER', stormDataTidy$EVTYPE)
 After tidying the dataset, the number of unique Event Type values were reduced
 to 81
 
-```{r, echo = TRUE}
+```{r display-unique-event-types-tidy, echo = TRUE}
 length(unique(stormDataTidy$EVTYPE))
 ```
 
@@ -289,7 +290,7 @@ Create four new variables based on date variables in the tidy dataset:
 | YEAR         | Year the event started                        |
 | DURATION     | Duration (in hours) of the event              |
 
-```{r, echo = TRUE}
+```{r clean-date-data, echo = TRUE}
 stormDataTidy$DATE_START <- as.Date(stormDataTidy$BGN_DATE, format = "%m/%d/%Y")
 stormDataTidy$DATE_END <- as.Date(stormDataTidy$END_DATE, format = "%m/%d/%Y")
 stormDataTidy$YEAR <- as.integer(format(stormDataTidy$DATE_START, "%Y"))
@@ -301,31 +302,31 @@ stormDataTidy$DURATION <- as.numeric(stormDataTidy$DATE_END - stormDataTidy$DATE
 According to the
 "National Weather Service [Storm Data Documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf)"
 (page 12), information about Property Damage is logged using two variables:
-`PROPDMG` and `PROPDMGEXP`. `PROPDMG` is the mantissa (significand) rounded to
-three significant digits and `PROPDMGEXP` is the exponent (the multiplier). The
-same approach is used for Crop Damage where the `CROPDMG` variable is encoded by
-the `CROPDMGEXP` variable.
+`PROPDMG` and `PROPDMGEXP`. `PROPDMG` is the mantissa (the significand) rounded
+to three significant digits and `PROPDMGEXP` is the exponent (the multiplier).
+The same approach is used for Crop Damage where the `CROPDMG` variable is
+encoded by the `CROPDMGEXP` variable.
 
 The documentation also specifies that the `PROPDMGEXP` and `CROPDMGEXP` are
 supposed to contain an alphabetical character used to signify magnitude and
-includes "K" for thousands, "M" for millions, and "B" for billions. A quick
+logs "K" for thousands, "M" for millions, and "B" for billions. A quick
 review of the data, however, shows that there are several other characters
 being logged.
 
-```{r, echo = TRUE}
+```{r convert-exp-char-toupper, echo = TRUE}
 table(toupper(stormDataTidy$PROPDMGEXP))
 table(toupper(stormDataTidy$CROPDMGEXP))
 ```
 
 In order to calculate costs, the `PROPDMGEXP` and `CROPDMGEXP` variables
 will be mapped to a multiplier factor which will then be used to calculate the
-actual costs of both property and crop damage. Two new variables will be
+actual costs for both property and crop damage. Two new variables will be
 created to store damage costs:
 
 * PROP_COST
 * CROP_COST
 
-```{r, echo = TRUE}
+```{r calculate-damage-costs, echo = TRUE}
 # function to get multiplier factor
 getMultiplier <- function(exp) {
     exp <- toupper(exp);
@@ -360,7 +361,7 @@ stormDataTidy$CROP_COST <- with(stormDataTidy, as.numeric(CROPDMG) * sapply(CROP
 Create a summarized dataset of health impact data (fatalities + injuries).
 Sort the results in descending order by health impact.
 
-```{r, echo = TRUE}
+```{r health-impact-summary, echo = TRUE}
 healthImpactData <- aggregate(x = list(HEALTH_IMPACT = stormDataTidy$FATALITIES + stormDataTidy$INJURIES), 
                                   by = list(EVENT_TYPE = stormDataTidy$EVTYPE), 
                                   FUN = sum,
@@ -371,7 +372,7 @@ healthImpactData <- healthImpactData[order(healthImpactData$HEALTH_IMPACT, decre
 Create a summarized dataset of damage impact costs (property damage + crop damage).
 Sort the results in descending order by damage cost.
 
-```{r, echo = TRUE}
+```{r damage-cost-impact-summary, echo = TRUE}
 damageCostImpactData <- aggregate(x = list(DAMAGE_IMPACT = stormDataTidy$PROP_COST + stormDataTidy$CROP_COST), 
                                   by = list(EVENT_TYPE = stormDataTidy$EVTYPE), 
                                   FUN = sum,
@@ -387,7 +388,7 @@ Fatalities and injuries have the most harmful impact on population health. The
 results below display the 10 most harmful weather events in terms of population
 health in the U.S.
 
-```{r, echo = TRUE, message = FALSE, results = 'asis'}
+```{r health-impact-table, echo = TRUE, message = FALSE, results = 'asis'}
 print(xtable(head(healthImpactData, 10),
              caption = "Top 10 Weather Events Most Harmful to Population Health"),
              caption.placement = 'top',
@@ -395,7 +396,7 @@ print(xtable(head(healthImpactData, 10),
              include.rownames = FALSE,
              html.table.attributes='class="table-bordered", width="100%"')
 ```
-<br /><br />
+<br />
 
 ```{r health-impact-chart, echo = TRUE, fig.path='figures/'}
 healthImpactChart <- ggplot(head(healthImpactData, 10),
@@ -415,7 +416,7 @@ Property and crop damage have the most harmful impact on the economy. The
 results below display the 10 most harmful weather events in terms economic
 consequences in the U.S.
 
-```{r, echo = TRUE, message = FALSE, results = 'asis'}
+```{r economic-impact-table, echo = TRUE, message = FALSE, results = 'asis'}
 print(xtable(head(damageCostImpactData, 10),
              caption = "Top 10 Weather Events with Greatest Economic Consequences"),
              caption.placement = 'top',
@@ -423,7 +424,7 @@ print(xtable(head(damageCostImpactData, 10),
              include.rownames = FALSE,
              html.table.attributes='class="table-bordered", width="100%"')
 ```
-<br /><br />
+<br />
 
 ```{r economic-impact-chart, echo = TRUE, fig.path='figures/'}
 damageCostImpactChart <- ggplot(head(damageCostImpactData, 10),

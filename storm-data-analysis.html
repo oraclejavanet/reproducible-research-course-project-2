@@ -193,7 +193,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Analysis of U.S. Storm Event Data and the Impact on Population Health and the Economy</h1>
 <h4 class="author">Jeffrey Hunter</h4>
-<h4 class="date">4/26/2019</h4>
+<h4 class="date">4/27/2019</h4>
 
 </div>
 
@@ -206,18 +206,17 @@ $(document).ready(function () {
 <h2>Synonpsis</h2>
 <p>Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.</p>
 <p>This report contains the results of an analysis where the goal was to identify the most hazardous weather events with respect to population health and those with the greatest economic impact in the U.S. based on data collected from the U.S. National Oceanic and Atmospheric Administration’s (NOAA).</p>
-<p>The storm database includes weather events from 1950 through the year 2011 and contains data estimates such as the number fatalities and injuries for each weather event as well as economic damage on properties and crops.</p>
-<p>The estimates for fatalities, injuries, property and crop damage were used to determine the most harmful impact to both population health and the economy.</p>
+<p>The storm database includes weather events from 1950 through the year 2011 and contains data estimates such as the number fatalities and injuries for each weather event as well as economic cost damage to properties and crops for each weather event.</p>
+<p>The estimates for fatalities and injuries were used to determine weather events with the most harmful impact to population health. Property damage and crop damage cost estimates were used to determine weather events with the greatest economic consequences.</p>
 </div>
 <div id="set-up-environment" class="section level2">
 <h2>Set Up Environment</h2>
-<p>Setup options</p>
+<p>Set global options</p>
 <pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)</code></pre>
 <p>Load libraries</p>
 <pre class="r"><code>library(dplyr, warn.conflicts = FALSE)
 library(xtable)
 library(ggplot2)
-library(scales)
 options(scipen = 1) # disable scientific notation for numbers</code></pre>
 <p>Session information</p>
 <pre class="r"><code>sessionInfo()</code></pre>
@@ -236,7 +235,7 @@ options(scipen = 1) # disable scientific notation for numbers</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] scales_1.0.0  ggplot2_3.1.1 xtable_1.8-4  dplyr_0.8.0.1
+## [1] ggplot2_3.1.1 xtable_1.8-4  dplyr_0.8.0.1
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_1.0.1       knitr_1.22       magrittr_1.5     munsell_0.5.0   
@@ -246,7 +245,7 @@ options(scipen = 1) # disable scientific notation for numbers</code></pre>
 ## [17] htmltools_0.3.6  lazyeval_0.2.2   yaml_2.2.0       assertthat_0.2.1
 ## [21] digest_0.6.18    tibble_2.1.1     crayon_1.3.4     purrr_0.3.2     
 ## [25] glue_1.3.1       evaluate_0.13    rmarkdown_1.12   stringi_1.4.3   
-## [29] compiler_3.5.3   pillar_1.3.1     pkgconfig_2.0.2</code></pre>
+## [29] compiler_3.5.3   pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2</code></pre>
 </div>
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
@@ -323,7 +322,7 @@ stopifnot(dim(stormData) == c(902297,37))</code></pre>
 <h2>Data Processing</h2>
 <div id="create-subset-of-data" class="section level3">
 <h3>Create Subset of Data</h3>
-<p>When processing a large dataset, compute performance can be improved by taking a subset of the variables associated to population health and economy damage. For this analysis, the dataset will be trimmed to only include the necessary variables (listed below). In addition, only observations with <code>value &gt; 0</code> will be included.</p>
+<p>When processing a large dataset, compute performance can be improved by taking a subset of the variables required for the analysis. For this analysis, the dataset will be trimmed to only include the necessary variables (listed below). In addition, only observations with <code>value &gt; 0</code> will be included.</p>
 <table>
 <thead>
 <tr class="header">
@@ -536,8 +535,8 @@ stormDataTidy$DURATION &lt;- as.numeric(stormDataTidy$DATE_END - stormDataTidy$D
 </div>
 <div id="clean-economic-data" class="section level3">
 <h3>Clean Economic Data</h3>
-<p>According to the “National Weather Service <a href="https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf">Storm Data Documentation</a>” (page 12), information about Property Damage is logged using two variables: <code>PROPDMG</code> and <code>PROPDMGEXP</code>. <code>PROPDMG</code> is the mantissa (significand) rounded to three significant digits and <code>PROPDMGEXP</code> is the exponent (the multiplier). The same approach is used for Crop Damage where the <code>CROPDMG</code> variable is encoded by the <code>CROPDMGEXP</code> variable.</p>
-<p>The documentation also specifies that the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> are supposed to contain an alphabetical character used to signify magnitude and includes “K” for thousands, “M” for millions, and “B” for billions. A quick review of the data, however, shows that there are several other characters being logged.</p>
+<p>According to the “National Weather Service <a href="https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf">Storm Data Documentation</a>” (page 12), information about Property Damage is logged using two variables: <code>PROPDMG</code> and <code>PROPDMGEXP</code>. <code>PROPDMG</code> is the mantissa (the significand) rounded to three significant digits and <code>PROPDMGEXP</code> is the exponent (the multiplier). The same approach is used for Crop Damage where the <code>CROPDMG</code> variable is encoded by the <code>CROPDMGEXP</code> variable.</p>
+<p>The documentation also specifies that the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> are supposed to contain an alphabetical character used to signify magnitude and logs “K” for thousands, “M” for millions, and “B” for billions. A quick review of the data, however, shows that there are several other characters being logged.</p>
 <pre class="r"><code>table(toupper(stormDataTidy$PROPDMGEXP))</code></pre>
 <pre><code>## 
 ##             -      +      0      2      3      4      5      6      7 
@@ -548,7 +547,7 @@ stormDataTidy$DURATION &lt;- as.numeric(stormDataTidy$DATE_END - stormDataTidy$D
 <pre><code>## 
 ##             ?      0      B      K      M 
 ## 152663      6     17      7  99953   1986</code></pre>
-<p>In order to calculate costs, the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> variables will be mapped to a multiplier factor which will then be used to calculate the actual costs of both property and crop damage. Two new variables will be created to store damage costs:</p>
+<p>In order to calculate costs, the <code>PROPDMGEXP</code> and <code>CROPDMGEXP</code> variables will be mapped to a multiplier factor which will then be used to calculate the actual costs for both property and crop damage. Two new variables will be created to store damage costs:</p>
 <ul>
 <li>PROP_COST</li>
 <li>CROP_COST</li>
@@ -609,7 +608,7 @@ damageCostImpactData &lt;- damageCostImpactData[order(damageCostImpactData$DAMAG
              include.rownames = FALSE,
              html.table.attributes='class=&quot;table-bordered&quot;, width=&quot;100%&quot;')</code></pre>
 <!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
-<!-- Sat Apr 27 21:33:20 2019 -->
+<!-- Sat Apr 27 22:15:54 2019 -->
 <table class="table-bordered" , width="100%">
 <caption align="top">
 Top 10 Weather Events Most Harmful to Population Health
@@ -703,7 +702,7 @@ HAIL
 </td>
 </tr>
 </table>
-<p><br /><br /></p>
+<p><br /></p>
 <pre class="r"><code>healthImpactChart &lt;- ggplot(head(healthImpactData, 10),
                             aes(x = reorder(EVENT_TYPE, HEALTH_IMPACT), y = HEALTH_IMPACT, fill = EVENT_TYPE)) +
                             coord_flip() +
@@ -725,7 +724,7 @@ print(healthImpactChart)</code></pre>
              include.rownames = FALSE,
              html.table.attributes='class=&quot;table-bordered&quot;, width=&quot;100%&quot;')</code></pre>
 <!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
-<!-- Sat Apr 27 21:33:21 2019 -->
+<!-- Sat Apr 27 22:15:55 2019 -->
 <table class="table-bordered" , width="100%">
 <caption align="top">
 Top 10 Weather Events with Greatest Economic Consequences
@@ -819,7 +818,7 @@ FIRE
 </td>
 </tr>
 </table>
-<p><br /><br /></p>
+<p><br /></p>
 <pre class="r"><code>damageCostImpactChart &lt;- ggplot(head(damageCostImpactData, 10),
                             aes(x = reorder(EVENT_TYPE, DAMAGE_IMPACT), y = DAMAGE_IMPACT, fill = EVENT_TYPE)) +
                             coord_flip() +
