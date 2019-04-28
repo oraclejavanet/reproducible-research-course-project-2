@@ -207,8 +207,8 @@ stormDataTidy$EVTYPE <- gsub('.*HAIL.*', 'HAIL', stormDataTidy$EVTYPE)
 # HEAT
 stormDataTidy$EVTYPE <- gsub('.*HEAT.*', 'HEAT', stormDataTidy$EVTYPE)
 stormDataTidy$EVTYPE <- gsub('.*WARM.*', 'HEAT', stormDataTidy$EVTYPE)
-stormDataTidy$EVTYPE <- gsub('.*HIGH.*TEMP.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
-stormDataTidy$EVTYPE <- gsub('.*RECORD HIGH TEMPERATURES.*', 'EXTREME HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*HIGH.*TEMP.*', 'HEAT', stormDataTidy$EVTYPE)
+stormDataTidy$EVTYPE <- gsub('.*RECORD HIGH TEMPERATURES.*', 'HEAT', stormDataTidy$EVTYPE)
 
 # HYPOTHERMIA/EXPOSURE
 stormDataTidy$EVTYPE <- gsub('.*HYPOTHERMIA.*', 'HYPOTHERMIA/EXPOSURE', stormDataTidy$EVTYPE)
