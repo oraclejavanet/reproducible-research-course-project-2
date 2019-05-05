@@ -5,26 +5,12 @@ date: "4/27/2019"
 output:
   html_document:
     df_print: paged
+    toc: true
+    toc_float: true
   pdf_document: default
   html_notebook: default
   pdf_notebook: default
 ---
-
-## Table of Contents
-
-[Synonpsis](#synonpsis)<br />
-[Set Up Environment](#set-up-environment)<br />
-[Load Data](#load-data)<br />
-[Data Processing](#data-processing)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Create Subset of Data](#create-subset-of-data)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Event Type Data](#clean-event-type-data)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Date Data](#clean-date-data)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Clean Economic Data](#clean-economic-data)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Summarize Data](#summarize-data)<br />
-[Results](#results)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types Most Harmful to Population Health](#event-types-most-harmful-to-population-health)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Event Types with Greatest Economic Consequences](#event-types-with-greatest-economic-consequences)<br />
-[Conclusion](#conclusion)
 
 ## Synonpsis
 
@@ -79,7 +65,7 @@ the data, validate the downloaded data file and loaded dataset by checking the f
 size and dimensions respectively.
 
 ```{r load-data, echo = TRUE, cache = TRUE}
-setwd("~jhunter/repos/coursera/reproducible-research-course-project-2")
+setwd("~jhunter/repos/coursera/data-science-specialization/reproducible-research-course-project-2")
 stormDataFileURL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 stormDataFile <- "data/storm-data.csv.bz2"
 if (!file.exists('data')) {
