@@ -1,16 +1,36 @@
 ---
 title: "Analysis of U.S. Storm Event Data and the Impact on Population Health and the Economy"
 author: "Jeffrey Hunter"
-date: "4/27/2019"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
+    toc: yes
+    toc_float: yes
+    theme: cosmo
+    keep_md: no
     df_print: paged
-    toc: true
-    toc_float: true
-  pdf_document: default
-  html_notebook: default
-  pdf_notebook: default
+  pdf_document:
+    toc: yes
+    df_print: kable
+    number_sections: false
+    fig_caption: yes
+    highlight: tango
+    dev: pdf
+  word_document:
+    toc: yes
+    df_print: paged
+    keep_md: no
 ---
+
+## Course Project
+
+**Reproducible Research Course Project 2**
+
+Peer-graded Assignment
+
+* This course project is available on GitHub
+
+    <a href="https://github.com/oraclejavanet/reproducible-research-course-project-2" target="_top">Reproducible Research Course Project 2</a>
 
 ## Synonpsis
 
@@ -34,24 +54,40 @@ with the most harmful impact to population health. Property damage and crop
 damage cost estimates were used to determine weather events with the
 greatest economic consequences.
 
-## Set Up Environment
+## Environment Setup
 
-Set global options
+```{r setup, include = FALSE}
+# set knitr options
+knitr::opts_chunk$set(echo = TRUE, fig.path='figures/')
 
-```{r global-options, include = TRUE}
-knitr::opts_chunk$set(echo = FALSE)
+# clear global workspace (including hidden objects) for this session
+rm(list = ls(all.names = TRUE))
+
+# free up memory and display statistics on free memory
+gc()
+
+# disable scientific notation for numbers
+options(scipen = 1)
 ```
 
-Load libraries
+Load packages used in this analysis.
 
-```{r load-libraries, echo = TRUE}
-library(dplyr, warn.conflicts = FALSE)
-library(xtable)
-library(ggplot2)
-options(scipen = 1) # disable scientific notation for numbers
+```{r load-packages, echo = TRUE}
+if (!require(ggplot2)) {
+    install.packages("ggplot2")
+    library(ggplot2)
+}
+if (!require(dplyr)) {
+    install.packages("dplyr")
+    library(dplyr, warn.conflicts = FALSE)
+}
+if (!require(xtable)) {
+    install.packages("xtable")
+    library(xtable, warn.conflicts = FALSE)
+}
 ```
 
-Session information
+Display session information.
 
 ```{r display-session-info, echo = TRUE}
 sessionInfo()
@@ -65,7 +101,7 @@ the data, validate the downloaded data file and loaded dataset by checking the f
 size and dimensions respectively.
 
 ```{r load-data, echo = TRUE, cache = TRUE}
-setwd("~jhunter/repos/coursera/data-science-specialization/reproducible-research-course-project-2")
+setwd("~/repos/coursera/github-assignments/reproducible-research-course-project-2")
 stormDataFileURL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 stormDataFile <- "data/storm-data.csv.bz2"
 if (!file.exists('data')) {
