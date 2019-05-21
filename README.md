@@ -1,4 +1,4 @@
-# Reproducible Research Project
+# Reproducible Research Course Project 2
 
 **Jeffrey M. Hunter**
 
@@ -8,13 +8,13 @@ April 27, 2019
 
 Peer-graded Assignment: Course Project 2
 
-* **Analysis report available on RPubs**
+**Analysis report available on RPubs**
 
-    <a href="http://rpubs.com/OracleJavaNet/491122">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
+* <a href="http://rpubs.com/OracleJavaNet/491122">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
 
-* **Storm data analysis Report**
+**Analysis report available on GitHub**
 
-    <a href="http://htmlpreview.github.io/?https://github.com/oraclejavanet/reproducible-research-course-project-2/blob/master/storm-data-analysis.html">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
+* <a href="http://htmlpreview.github.io/?https://github.com/oraclejavanet/reproducible-research-course-project-2/blob/master/storm-data-analysis.html" target="_blank">Analysis of U.S. Storm Event Data and the Impact on Public Health and the Economy</a>
 
 ## Introduction
 
