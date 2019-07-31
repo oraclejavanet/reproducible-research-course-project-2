@@ -101,7 +101,7 @@ the data, validate the downloaded data file and loaded dataset by checking the f
 size and dimensions respectively.
 
 ```{r load-data, echo = TRUE, cache = TRUE}
-setwd("~/repos/coursera/github-assignments/reproducible-research-course-project-2")
+setwd("~/repos/coursera/data-science-specialization-github-assignments/reproducible-research-course-project-2")
 stormDataFileURL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 stormDataFile <- "data/storm-data.csv.bz2"
 if (!file.exists('data')) {
